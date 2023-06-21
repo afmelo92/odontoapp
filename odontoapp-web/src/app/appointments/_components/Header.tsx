@@ -1,19 +1,25 @@
+"use client";
+
 import Input from "./Input";
-import { ActionProps } from "../page";
+import { useAppointments } from "../_hooks/useAppointments";
 
-export type HeaderProps = {
-  searchData: string;
-  dispatch: React.Dispatch<ActionProps>;
-};
+const Header: React.FC = () => {
+  const { state, dispatch } = useAppointments();
 
-const Header: React.FC<HeaderProps> = ({ searchData, dispatch }) => {
   return (
     <div id="header" className="flex items-center justify-between p-6">
       <h2 className="text-base font-bold text-gray-700">
-        6 appointments <span className="font-normal">for</span>{" "}
-        <span className="text-blue-500"> 14 jun 2023</span>
+        {`${state.appointments.length} appointments`}{" "}
+        <span className="font-normal">for</span>{" "}
+        <span className="text-blue-500">
+          {new Intl.DateTimeFormat("pt-BR", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          }).format(new Date())}
+        </span>
       </h2>
-      <Input searchData={searchData} dispatch={dispatch} />
+      <Input searchData={state.searchData} dispatch={dispatch} />
     </div>
   );
 };

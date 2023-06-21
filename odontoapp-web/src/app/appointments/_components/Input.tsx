@@ -1,5 +1,5 @@
 import { MagnifyingGlassIcon } from "@/assets/icons/magnifier";
-import { ActionProps } from "../page";
+import { ActionProps } from "../_contexts/AppointmentContext";
 
 type InputProps = {
   searchData: string;
