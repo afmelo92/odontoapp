@@ -4,6 +4,7 @@ import { ChatBubbleLeftEllipsisIcon } from "@/assets/icons/chatBubbleLeftEllipsi
 import { ChevronLeftIcon } from "@/assets/icons/chevronLeft";
 import { ChevronRightIcon } from "@/assets/icons/chevronRight";
 import { DocumentTextIcon } from "@/assets/icons/document";
+import { MagnifyingGlassIcon } from "@/assets/icons/magnifier";
 import { PlusCircleIcon } from "@/assets/icons/plusCircle";
 import { ShoppingCartIcon } from "@/assets/icons/shoppingCart";
 import { Squares2x2Icon } from "@/assets/icons/squares2x2";
@@ -58,6 +59,8 @@ export function getIcon({ name, ...rest }: Props) {
       return <StarIcon {...rest} />;
     case "video-camera":
       return <VideoCameraIcon {...rest} />;
+    case "magnifier":
+      return <MagnifyingGlassIcon {...rest} />;
     default:
       break;
   }

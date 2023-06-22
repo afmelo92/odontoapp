@@ -18,12 +18,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={poppins.className}>
-        <main className="grid grid-cols-[72px_1fr] grid-rows-[72px_1fr] h-screen overflow-hidden">
+        <main className="grid grid-cols-[72px_1fr] grid-rows-[72px_1fr] h-screen">
           <Navbar />
           <SideMenu />
           <section
             id="content"
-            className="bg-indigo-50 p-6 flex flex-col gap-6"
+            className="bg-indigo-50 p-6 flex flex-col gap-6 overflow-hidden"
           >
             {children}
           </section>
