@@ -1,4 +1,4 @@
-import { ActionProps } from "../../appointments/_contexts/AppointmentContext";
+import { ActionProps } from "../../appointments/_contexts/AppointmentsContext";
 import { getIcon } from "@/utils/getIcon";
 
 type InputProps = {

@@ -37,11 +37,9 @@ const ProductRow: React.FC<ProductRowProps> = ({ exhibitor }) => {
         {exhibitor.name}
       </h1>
       <Swiper
-        loop={true}
         navigation={true}
         modules={[Navigation]}
         slidesPerView={1}
-        // spaceBetween={16}
         breakpoints={{
           640: {
             slidesPerView: 2,
