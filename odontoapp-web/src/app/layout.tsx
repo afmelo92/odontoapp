@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={poppins.className}>
-        <main className="grid grid-cols-[72px_1fr] grid-rows-[72px_1fr] h-screen">
+        <main className="grid grid-cols-[72px_1fr] grid-rows-[72px_1fr] h-screen relative overflow-hidden">
           <Navbar />
           <SideMenu />
           <section
