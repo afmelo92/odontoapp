@@ -1,4 +1,4 @@
-import { Patient } from "../_contexts/PatientContext";
+import { Patient } from "../_contexts/PatientsContext";
 import { getIcon } from "@/utils/getIcon";
 
 type TableRowProps = {

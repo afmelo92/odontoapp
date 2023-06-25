@@ -1,6 +1,6 @@
 "use client";
 
-import Input from "./Input";
+import SearchInput from "./SearchInput";
 import { usePatients } from "../_hooks/usePatients";
 
 const Header: React.FC = () => {
@@ -12,7 +12,7 @@ const Header: React.FC = () => {
         <span className="text-gray-900 font-bold">{`${state.patients.length}`}</span>{" "}
         patients total
       </h2>
-      <Input searchData={state.searchData} dispatch={dispatch} />
+      <SearchInput searchData={state.searchData} dispatch={dispatch} />
     </div>
   );
 };

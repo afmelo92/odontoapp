@@ -1,4 +1,4 @@
-import { PatientsContextProvider } from "./_contexts/PatientContext";
+import { PatientsContextProvider } from "./_contexts/PatientsContext";
 
 type PatientsLayoutProps = {
   children: React.ReactNode;
