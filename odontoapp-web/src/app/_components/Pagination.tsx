@@ -33,16 +33,18 @@ const Pagination: React.FC<PaginationProps> = ({ state, dispatch }) => {
       >
         {getIcon({
           name: "chevron-left",
-          className: "w-4 h-4 stroke-gray-900 transition-colors",
+          className:
+            "w-4 h-4 stroke-gray-600 group-hover:stroke-blue-500 group-disabled:stroke-gray-600",
           strokeWidth: 2,
         })}
       </button>
       <p className="h-full flex items-center text-sm">
-        page <span className="font-bold">&nbsp;{state.page}&nbsp;</span> /{" "}
+        page&nbsp; <span className="font-bold">&nbsp;{state.page}&nbsp;</span>{" "}
+        /&nbsp;
         {state.totalPages}
       </p>
       <button
-        className="group flex items-center py-3 px-3 rounded-r-full border-l-gray-200 border-l-2 disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-100"
+        className="group flex items-center py-3 px-3 rounded-r-full border-l-gray-200 border-l-2 disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-100 transition-all"
         disabled={!state.next}
         onClick={() =>
           dispatch({
@@ -52,7 +54,8 @@ const Pagination: React.FC<PaginationProps> = ({ state, dispatch }) => {
       >
         {getIcon({
           name: "chevron-right",
-          className: "w-4 h-4 stroke-gray-900 transition-colors",
+          className:
+            "w-4 h-4 stroke-gray-600 group-hover:stroke-blue-500 group-disabled:stroke-gray-600",
           strokeWidth: 2,
         })}
       </button>
