@@ -1,5 +1,4 @@
-import { CheckIcon } from "@/assets/icons/check";
-import { Appointment } from "../_contexts/AppointmentContext";
+import { Appointment } from "../_contexts/AppointmentsContext";
 import { getIcon } from "@/utils/getIcon";
 
 type TableRowProps = {
@@ -39,7 +38,11 @@ const TableRow: React.FC<TableRowProps> = ({ appointment, header = false }) => {
           {appointment?.patient}{" "}
           {appointment?.confirmed && (
             <span>
-              <CheckIcon className="w-5 h-5 stroke-green-500" strokeWidth={2} />
+              {getIcon({
+                name: "check",
+                className: "w-5 h-5 stroke-green-500",
+                strokeWidth: 2,
+              })}
             </span>
           )}
         </p>
@@ -69,7 +72,7 @@ const TableRow: React.FC<TableRowProps> = ({ appointment, header = false }) => {
         <div className="flex gap-2">
           <button
             className="group bg-green-100 p-4 rounded-xl hover:bg-green-200 transition-colors"
-            title="Visualize appointment info"
+            title="Visualize appointment details"
           >
             {getIcon({
               name: "document-text",

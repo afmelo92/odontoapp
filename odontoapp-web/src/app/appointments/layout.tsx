@@ -1,4 +1,4 @@
-import { AppointmentContextProvider } from "./_contexts/AppointmentContext";
+import { AppointmentsContextProvider } from "./_contexts/AppointmentsContext";
 
 type AppointmentsLayoutProps = {
   children: React.ReactNode;
@@ -7,7 +7,7 @@ type AppointmentsLayoutProps = {
 const AppointmentsLayout: React.FC<AppointmentsLayoutProps> = ({
   children,
 }) => {
-  return <AppointmentContextProvider>{children}</AppointmentContextProvider>;
+  return <AppointmentsContextProvider>{children}</AppointmentsContextProvider>;
 };
 
 export default AppointmentsLayout;

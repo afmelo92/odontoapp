@@ -1,5 +1,5 @@
-import { MagnifyingGlassIcon } from "@/assets/icons/magnifier";
-import { ActionProps } from "../_contexts/AppointmentContext";
+import { ActionProps } from "../_contexts/AppointmentsContext";
+import { getIcon } from "@/utils/getIcon";
 
 type InputProps = {
   searchData: string;
@@ -23,10 +23,11 @@ const Input: React.FC<InputProps> = ({ searchData, dispatch }) => {
           })
         }
       />
-      <MagnifyingGlassIcon
-        className="w-5 h-5 stroke-gray-400"
-        strokeWidth={2}
-      />
+      {getIcon({
+        name: "magnifier",
+        className: "w-5 h-5 stroke-gray-400",
+        strokeWidth: 2,
+      })}
     </div>
   );
 };

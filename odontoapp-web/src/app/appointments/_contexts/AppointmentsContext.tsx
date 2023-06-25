@@ -223,7 +223,7 @@ const AppointmentsContext = createContext<ContextProps>({
   dispatch: () => null,
 });
 
-const AppointmentContextProvider = ({ children }: ProviderProps) => {
+const AppointmentsContextProvider = ({ children }: ProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState, (init) => {
     const firstSlice = init.appointments.slice(
       init.pagination.index,
@@ -250,4 +250,4 @@ const AppointmentContextProvider = ({ children }: ProviderProps) => {
   );
 };
 
-export { AppointmentContextProvider, AppointmentsContext };
+export { AppointmentsContextProvider, AppointmentsContext };
