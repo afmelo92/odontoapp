@@ -1,6 +1,8 @@
 import { BanknotesIcon } from "@/assets/icons/bankNotes";
+import { BellIcon } from "@/assets/icons/bell";
 import { CalendarDaysIcon } from "@/assets/icons/calendarDays";
 import { ChatBubbleLeftEllipsisIcon } from "@/assets/icons/chatBubbleLeftEllipsis";
+import { CheckIcon } from "@/assets/icons/check";
 import { ChevronLeftIcon } from "@/assets/icons/chevronLeft";
 import { ChevronRightIcon } from "@/assets/icons/chevronRight";
 import { DocumentTextIcon } from "@/assets/icons/document";
@@ -11,11 +13,13 @@ import { Squares2x2Icon } from "@/assets/icons/squares2x2";
 import { StarIcon } from "@/assets/icons/star";
 import { ToothIcon } from "@/assets/icons/tooth";
 import { TrashIcon } from "@/assets/icons/trash";
+import { UserIcon } from "@/assets/icons/user";
 import { UsersIcon } from "@/assets/icons/users";
 import { UserGroupIcon } from "@/assets/icons/usersGroup";
 import { VideoCameraIcon } from "@/assets/icons/videoCamera";
 import { WrenchScrewdriverIcon } from "@/assets/icons/wrenchScrewdriver";
 import { XCircleIcon } from "@/assets/icons/xcircle";
+import { XMarkIcon } from "@/assets/icons/xmark";
 
 type Props = {
   name: string;
@@ -61,6 +65,14 @@ export function getIcon({ name, ...rest }: Props) {
       return <VideoCameraIcon {...rest} />;
     case "magnifier":
       return <MagnifyingGlassIcon {...rest} />;
+    case "bell":
+      return <BellIcon {...rest} />;
+    case "check":
+      return <CheckIcon {...rest} />;
+    case "xmark":
+      return <XMarkIcon {...rest} />;
+    case "user":
+      return <UserIcon {...rest} />;
     default:
       break;
   }
