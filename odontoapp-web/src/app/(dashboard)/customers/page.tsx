@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Header from "./_components/Header";
 import Table from "./_components/Table";
 import { FormProvider, useForm } from "react-hook-form";
-import SideDetails from "../_components/SideDetails";
+import SideDetails from "@/app/_components/SideDetails";
 import CreateCustomerForm from "./_components/Forms/CreateCustomer";
 
 export type CreateCustomerInputs = {

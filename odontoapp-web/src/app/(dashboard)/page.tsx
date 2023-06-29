@@ -1,6 +1,6 @@
-import AdBanner from "./_components/AdBanner";
-import SecondaryStats from "./_components/SecondaryStats";
-import Statistics from "./_components/Statistics";
+import AdBanner from "@/app/_components/AdBanner";
+import SecondaryStats from "@/app/_components/SecondaryStats";
+import Statistics from "@/app/_components/Statistics";
 
 export default function Dashboard() {
   return (

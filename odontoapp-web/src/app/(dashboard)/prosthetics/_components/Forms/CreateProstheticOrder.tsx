@@ -1,6 +1,6 @@
 import ControlledInput from "@/app/_components/ControlledInput";
 import ControlledSelect from "@/app/_components/ControlledSelect";
-import { patientsMock } from "@/app/patients/_contexts/PatientsContext";
+import { patientsMock } from "@/app/(dashboard)/patients/_contexts/PatientsContext";
 import React, { useEffect } from "react";
 import { Controller, SubmitHandler, useFormContext } from "react-hook-form";
 import { CreateProstheticsInputs } from "../../page";

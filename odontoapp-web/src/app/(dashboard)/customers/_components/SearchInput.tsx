@@ -1,4 +1,4 @@
-import { ActionProps } from "../../appointments/_contexts/AppointmentsContext";
+import { ActionProps } from "@/app/(dashboard)/appointments/_contexts/AppointmentsContext";
 import { getIcon } from "@/utils/getIcon";
 
 type InputProps = {
@@ -24,7 +24,7 @@ const SearchInput: React.FC<InputProps> = ({ searchData, dispatch }) => {
         }
       />
       {getIcon({
-        name: "maginifier",
+        name: "magnifier",
         className: "w-5 h-5 stroke-gray-400",
         strokeWidth: 2,
       })}

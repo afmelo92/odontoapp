@@ -3,7 +3,7 @@ import React, { useCallback, useState } from "react";
 import Header from "./_components/Header";
 import Table from "./_components/Table";
 import { getIcon } from "@/utils/getIcon";
-import SideDetails from "../_components/SideDetails";
+import SideDetails from "@/app/_components/SideDetails";
 import { FormProvider, useForm } from "react-hook-form";
 import CreatePatientForm from "./_components/Forms/CreatePatient";
 import { usePatients } from "./_hooks/usePatients";

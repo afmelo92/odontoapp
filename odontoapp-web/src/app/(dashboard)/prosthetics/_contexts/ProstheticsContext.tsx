@@ -1,38 +1,48 @@
 "use client";
 
+import { createContext, useReducer } from "react";
 import { PaginationStateProps } from "@/app/_components/Pagination";
 import {
   Patient,
   patientsMock,
-} from "@/app/patients/_contexts/PatientsContext";
-import { createContext, useReducer } from "react";
+} from "@/app/(dashboard)/patients/_contexts/PatientsContext";
 
-export type Appointment = {
+export type ProstheticsService = {
   id: number;
   patient: Patient;
   age: number;
   sex: "M" | "F";
-  reason: string;
-  date: Date | number;
+  name: string;
+  deadline: Date | number;
   formattedDate?: string;
+  status: number;
+  formattedStatus?: string;
+  lab: string;
   confirmed: boolean;
 };
 
 export type StateProps = {
   searchData: string;
-  appointments: Appointment[];
-  filtered: Appointment[];
+  services: ProstheticsService[];
+  filtered: ProstheticsService[];
   pagination: PaginationStateProps;
 };
 
-const mock: Appointment[] = [
+export type ActionProps = {
+  type: "SET_NEXT_PAGE" | "SET_PREV_PAGE" | "FILTER_DATA";
+  payload?: any;
+};
+
+const mock: ProstheticsService[] = [
   {
     id: 1,
     patient: patientsMock[0],
     age: 61,
     sex: "M",
-    reason: "Canal",
-    date: new Date("2023-06-16T13:30:00.000Z"),
+    name: "Facetas em dissilicato de lítio",
+    deadline: new Date("2023-07-01T13:30:00.000Z"),
+    lab: "Pucci Dental Lab",
+    status: 1,
     confirmed: true,
   },
   {
@@ -40,17 +50,21 @@ const mock: Appointment[] = [
     patient: patientsMock[1],
     age: 64,
     sex: "M",
-    reason: "Avaliação",
-    date: new Date("2023-06-16T15:30:00.000Z"),
-    confirmed: true,
+    name: "Coroa metalocerâmica sobre implante",
+    deadline: new Date("2023-07-01T15:30:00.000Z"),
+    lab: "Pucci Dental Lab",
+    status: 2,
+    confirmed: false,
   },
   {
     id: 3,
     patient: patientsMock[2],
     age: 62,
     sex: "M",
-    reason: "Extração",
-    date: new Date("2023-06-16T16:30:00.000Z"),
+    name: "Adesiva",
+    deadline: new Date("2023-07-01T16:30:00.000Z"),
+    lab: "Pucci Dental Lab",
+    status: 1,
     confirmed: true,
   },
   {
@@ -58,8 +72,10 @@ const mock: Appointment[] = [
     patient: patientsMock[3],
     age: 44,
     sex: "M",
-    reason: "Facetas",
-    date: new Date("2023-06-16T18:30:00.000Z"),
+    name: "Onlay/Inlay/Overlay",
+    deadline: new Date("2023-07-02T18:30:00.000Z"),
+    lab: "Pucci Dental Lab",
+    status: 4,
     confirmed: false,
   },
   {
@@ -67,8 +83,10 @@ const mock: Appointment[] = [
     patient: patientsMock[4],
     age: 50,
     sex: "M",
-    reason: "Avaliação",
-    date: new Date("2023-06-16T19:30:00.000Z"),
+    name: "Provisório",
+    deadline: new Date("2023-07-03T19:30:00.000Z"),
+    lab: "Pucci Dental Lab",
+    status: 3,
     confirmed: false,
   },
   {
@@ -76,43 +94,54 @@ const mock: Appointment[] = [
     patient: patientsMock[5],
     age: 33,
     sex: "M",
-    reason: "Avaliação",
-    date: new Date("2023-06-16T20:30:00.000Z"),
+    name: "Placa de clareamento",
+    deadline: new Date("2023-07-03T20:30:00.000Z"),
+    lab: "Pucci Dental Lab",
+    status: 5,
     confirmed: true,
   },
   {
     id: 7,
-    patient: patientsMock[5],
+    patient: patientsMock[6],
     age: 30,
     sex: "M",
-    reason: "Harmonização facial",
-    date: new Date("2023-06-17T11:30:00.000Z"),
+    name: "Planejamento digital",
+    deadline: new Date("2023-07-04T11:30:00.000Z"),
+    lab: "Pucci Dental Lab",
+    status: 2,
     confirmed: false,
   },
   {
     id: 8,
-    patient: patientsMock[6],
+    patient: patientsMock[7],
     age: 39,
     sex: "M",
-    reason: "Harmonização facial",
-    date: new Date("2023-06-30T11:30:00.000Z"),
+    name: "Mockup + guias de desgaste",
+    deadline: new Date("2023-07-05T11:30:00.000Z"),
+    lab: "Pucci Dental Lab",
+    status: 2,
     confirmed: false,
   },
 ];
 
-export type ActionProps = {
-  type: "SET_NEXT_PAGE" | "SET_PREV_PAGE" | "FILTER_DATA";
-  payload?: any;
-};
-
 const initialState = {
   searchData: "",
-  appointments: mock.map((appointment) => ({
-    ...appointment,
+  services: mock.map((service) => ({
+    ...service,
     formattedDate: new Intl.DateTimeFormat("pt-BR", {
       day: "2-digit",
       month: "short",
-    }).format(new Date(appointment.date)),
+    }).format(new Date(service.deadline)),
+    formattedStatus:
+      service.status === 1
+        ? "Finished"
+        : service.status === 2
+        ? "Delayed"
+        : service.status === 3
+        ? "Adjustments"
+        : service.status === 4
+        ? "On progress"
+        : "Canceled",
   })),
   filtered: [],
   pagination: {
@@ -130,7 +159,7 @@ function reducer(state: StateProps, action: ActionProps) {
     case "SET_NEXT_PAGE": {
       const nextPage = state.pagination.page + 1;
       const nextIndex = (nextPage - 1) * state.pagination.perPage;
-      const nextFiltered = state.appointments.slice(
+      const nextFiltered = state.services.slice(
         nextIndex,
         nextIndex + state.pagination.perPage
       );
@@ -151,7 +180,7 @@ function reducer(state: StateProps, action: ActionProps) {
     case "SET_PREV_PAGE": {
       const prevPage = state.pagination.page - 1;
       const prevIndex = (prevPage - 1) * state.pagination.perPage;
-      const prevFiltered = state.appointments.slice(
+      const prevFiltered = state.services.slice(
         prevIndex,
         prevIndex + state.pagination.perPage
       );
@@ -173,23 +202,24 @@ function reducer(state: StateProps, action: ActionProps) {
       const {
         payload: { data },
       } = action;
-      const filteredPatients =
+      const filteredServices =
         data !== ""
-          ? state.appointments.filter(
-              (appointment) =>
-                appointment.patient.name
+          ? state.services.filter(
+              (service) =>
+                service.patient.name
                   .toLowerCase()
                   .includes(data.toLowerCase()) ||
-                appointment.reason.toLowerCase().includes(data.toLowerCase()) ||
-                appointment?.formattedDate
+                service.name.toLowerCase().includes(data.toLowerCase()) ||
+                service?.formattedDate
                   ?.toLowerCase()
                   .includes(data.toLowerCase()) ||
-                appointment.sex.toLowerCase().includes(data.toLowerCase()) ||
-                appointment.date.toString().includes(data)
+                service.sex.toLowerCase().includes(data.toLowerCase()) ||
+                service.deadline.toString().includes(data) ||
+                service.formattedStatus?.toLocaleLowerCase().includes(data)
             )
-          : state.appointments;
+          : state.services;
       const totalFilteredPages = Math.ceil(
-        filteredPatients.length / state.pagination.perPage
+        filteredServices.length / state.pagination.perPage
       );
       const hasNext = totalFilteredPages > 1;
       const hasPrev = false;
@@ -197,7 +227,7 @@ function reducer(state: StateProps, action: ActionProps) {
       return {
         ...state,
         searchData: action.payload.data,
-        filtered: filteredPatients.slice(0, state.pagination.perPage),
+        filtered: filteredServices.slice(0, state.pagination.perPage),
         pagination: {
           ...state.pagination,
           page: 1,
@@ -222,14 +252,14 @@ type ProviderProps = {
   children: React.ReactNode;
 };
 
-const AppointmentsContext = createContext<ContextProps>({
+const ProstheticsContext = createContext<ContextProps>({
   state: initialState,
   dispatch: () => null,
 });
 
-const AppointmentsContextProvider = ({ children }: ProviderProps) => {
+const ProstheticsContextProvider = ({ children }: ProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState, (init) => {
-    const firstSlice = init.appointments.slice(
+    const firstSlice = init.services.slice(
       init.pagination.index,
       init.pagination.perPage
     );
@@ -239,19 +269,17 @@ const AppointmentsContextProvider = ({ children }: ProviderProps) => {
       filtered: firstSlice,
       pagination: {
         ...init.pagination,
-        totalPages: Math.ceil(
-          init.appointments.length / init.pagination.perPage
-        ),
+        totalPages: Math.ceil(init.services.length / init.pagination.perPage),
         next: firstSlice.length <= init.pagination.perPage,
       },
     };
   });
 
   return (
-    <AppointmentsContext.Provider value={{ state, dispatch }}>
+    <ProstheticsContext.Provider value={{ state, dispatch }}>
       {children}
-    </AppointmentsContext.Provider>
+    </ProstheticsContext.Provider>
   );
 };
 
-export { AppointmentsContextProvider, AppointmentsContext };
+export { ProstheticsContextProvider, ProstheticsContext };
