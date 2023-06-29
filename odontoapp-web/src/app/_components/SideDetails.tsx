@@ -1,7 +1,10 @@
 import { getIcon } from "@/utils/getIcon";
+import { useCallback, useEffect } from "react";
 
 type SideDetailsProps = {
-  onShow: React.Dispatch<React.SetStateAction<boolean>>;
+  // onShow: React.Dispatch<React.SetStateAction<boolean>>;
+  // eslint-disable-next-line no-unused-vars
+  onShow: (x: boolean) => void | React.Dispatch<React.SetStateAction<boolean>>;
   children: React.ReactNode;
   title?: string;
 };
@@ -11,6 +14,24 @@ const SideDetails: React.FC<SideDetailsProps> = ({
   title = "",
   onShow,
 }) => {
+  const handleUserKeyPress = useCallback(
+    (event: KeyboardEvent) => {
+      const { key } = event;
+
+      if (key === "Escape") {
+        onShow(false);
+      }
+    },
+    [onShow]
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleUserKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleUserKeyPress);
+    };
+  }, [handleUserKeyPress]);
+
   return (
     <div
       className="bg-white shadow-[-6px_0px_5px_-4px_rgba(166,166,166,1)] absolute right-0 top-[72px] 
@@ -31,7 +52,7 @@ const SideDetails: React.FC<SideDetailsProps> = ({
           })}
         </button>
       </div>
-      <div className="h-full overflow-y-auto overflow-x-hidden p-6">
+      <div className="h-full overflow-y-auto overflow-x-hidden px-6 pt-6">
         {children}
       </div>
     </div>
