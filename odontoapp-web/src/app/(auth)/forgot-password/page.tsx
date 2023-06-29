@@ -4,16 +4,14 @@ import { getIcon } from "@/utils/getIcon";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 
-type SignInInputs = {
+type ForgotPasswordInputs = {
   email: string;
-  password: string;
 };
 
-const SignInPage: React.FC = () => {
-  const { control } = useForm<SignInInputs>({
+const ForgotPasswordPage: React.FC = () => {
+  const { control } = useForm<ForgotPasswordInputs>({
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
@@ -47,23 +45,8 @@ const SignInPage: React.FC = () => {
                 />
               )}
             />
-            <Controller
-              name="password"
-              control={control}
-              render={({ field }) => (
-                <ControlledInput
-                  {...field}
-                  type="password"
-                  label="Password"
-                  placeholder="Your secret passsword"
-                  required
-                  leftIcon="lock-closed"
-                  sizeType="lg"
-                />
-              )}
-            />
             <button className="bg-blue-500 hover:bg-blue-700 transition-colors p-4 rounded-xl font-semibold text-white">
-              Login
+              Send recovering email
             </button>
 
             <div
@@ -71,17 +54,10 @@ const SignInPage: React.FC = () => {
               className="w-full flex flex-col justify-center gap-2 text-xs font-semibold text-blue-500"
             >
               <Link
-                href="/forgot-password"
+                href="/signin"
                 className="w-fit self-center border-2 border-white hover:text-blue-700 hover:border-b-blue-500"
               >
-                Forgot Password
-              </Link>
-              <small className="text-center">or</small>
-              <Link
-                href="/signup"
-                className="text-base border-2 border-blue-500 p-4 rounded-xl font-semibold text-center text-blue-500 hover:border-blue-700 hover:bg-blue-700 hover:text-white transition-colors"
-              >
-                Create account
+                Back to login
               </Link>
             </div>
           </div>
@@ -97,4 +73,4 @@ const SignInPage: React.FC = () => {
   );
 };
 
-export default SignInPage;
+export default ForgotPasswordPage;

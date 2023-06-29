@@ -1,19 +1,25 @@
 "use client";
 import ControlledInput from "@/app/_components/ControlledInput";
 import { getIcon } from "@/utils/getIcon";
-import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
+import Link from "next/link";
 
-type SignInInputs = {
+type SignUpInputs = {
+  fullName: string;
+  cpf_cnpj: string;
   email: string;
   password: string;
+  confirm_password: string;
 };
 
-const SignInPage: React.FC = () => {
-  const { control } = useForm<SignInInputs>({
+const SignUpPage: React.FC = () => {
+  const { control } = useForm<SignUpInputs>({
     defaultValues: {
+      fullName: "",
+      cpf_cnpj: "",
       email: "",
       password: "",
+      confirm_password: "",
     },
   });
 
@@ -32,6 +38,36 @@ const SignInPage: React.FC = () => {
             id="inputs-container"
             className="flex flex-col justify-center gap-4 w-full"
           >
+            <Controller
+              name="fullName"
+              control={control}
+              render={({ field }) => (
+                <ControlledInput
+                  {...field}
+                  type="text"
+                  label="Fullname"
+                  placeholder="John Doe"
+                  required
+                  leftIcon="user"
+                  sizeType="lg"
+                />
+              )}
+            />
+            <Controller
+              name="cpf_cnpj"
+              control={control}
+              render={({ field }) => (
+                <ControlledInput
+                  {...field}
+                  type="text"
+                  label="CPF/CNPJ"
+                  placeholder="123.456.789-55 or 11.222.333/0001-55"
+                  required
+                  leftIcon="building-office"
+                  sizeType="lg"
+                />
+              )}
+            />
             <Controller
               name="email"
               control={control}
@@ -62,8 +98,23 @@ const SignInPage: React.FC = () => {
                 />
               )}
             />
+            <Controller
+              name="confirm_password"
+              control={control}
+              render={({ field }) => (
+                <ControlledInput
+                  {...field}
+                  type="password"
+                  label="Confirm password"
+                  placeholder="Confirm your secret passsword"
+                  required
+                  leftIcon="lock-closed"
+                  sizeType="lg"
+                />
+              )}
+            />
             <button className="bg-blue-500 hover:bg-blue-700 transition-colors p-4 rounded-xl font-semibold text-white">
-              Login
+              Create account
             </button>
 
             <div
@@ -71,17 +122,10 @@ const SignInPage: React.FC = () => {
               className="w-full flex flex-col justify-center gap-2 text-xs font-semibold text-blue-500"
             >
               <Link
-                href="/forgot-password"
+                href="/signin"
                 className="w-fit self-center border-2 border-white hover:text-blue-700 hover:border-b-blue-500"
               >
-                Forgot Password
-              </Link>
-              <small className="text-center">or</small>
-              <Link
-                href="/signup"
-                className="text-base border-2 border-blue-500 p-4 rounded-xl font-semibold text-center text-blue-500 hover:border-blue-700 hover:bg-blue-700 hover:text-white transition-colors"
-              >
-                Create account
+                Back to login
               </Link>
             </div>
           </div>
@@ -97,4 +141,4 @@ const SignInPage: React.FC = () => {
   );
 };
 
-export default SignInPage;
+export default SignUpPage;

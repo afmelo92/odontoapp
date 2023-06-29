@@ -7,10 +7,22 @@ interface ControlledInputProps extends InputHTMLAttributes<HTMLInputElement> {
   rightIcon?: string;
   name: string;
   required?: boolean;
+  sizeType?: "sm" | "base" | "lg";
 }
 
 const ControlledInput = forwardRef<HTMLInputElement, ControlledInputProps>(
-  ({ name, label, leftIcon, rightIcon, required = false, ...rest }, ref) => {
+  (
+    {
+      name,
+      label,
+      leftIcon,
+      rightIcon,
+      required = false,
+      sizeType = "base",
+      ...rest
+    },
+    ref
+  ) => {
     return (
       <div id="input-wrapper" className="group flex flex-col gap-2">
         {label && (
@@ -36,7 +48,9 @@ const ControlledInput = forwardRef<HTMLInputElement, ControlledInputProps>(
           <input
             className={`w-full ${leftIcon ? "pl-8" : "pl-4"} ${
               rightIcon ? "pr-8" : "pr-4"
-            } py-2 border-2 border-gray-400 rounded-xl outline-2 focus:outline-blue-500 placeholder:text-gray-400 block`}
+            } ${
+              sizeType === "base" ? "py-2" : "py-3"
+            } border-2 border-gray-400 rounded-xl outline-2 focus:outline-blue-500 placeholder:text-gray-400 block`}
             {...rest}
             // required={required}
             ref={ref}
