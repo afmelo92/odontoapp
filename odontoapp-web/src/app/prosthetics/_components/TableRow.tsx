@@ -29,12 +29,12 @@ const TableRow: React.FC<TableRowProps> = ({ service, header = false }) => {
     >
       <td
         className="flex flex-col"
-        title={`${service?.patient} :: ${service?.age} yo, ${
+        title={`${service?.patient.name} :: ${service?.age} yo, ${
           service?.sex === "M" ? "M" : "F"
-        }  ${service?.confirmed ? ":: Confirmed" : ""}`}
+        }  ${service?.confirmed ? ":: Service confirmed" : ""}`}
       >
         <p className="font-bold text-gray-950 flex gap-2 items-center pr-2 truncate">
-          {service?.patient}{" "}
+          {service?.patient.name}{" "}
           {service?.confirmed && (
             <span>
               {getIcon({
@@ -49,7 +49,10 @@ const TableRow: React.FC<TableRowProps> = ({ service, header = false }) => {
           {service?.age} yo, {service?.sex === "M" ? "Male" : "Female"}
         </small>
       </td>
-      <td title={`${service?.name}`} className="truncate pr-2">
+      <td
+        title={`${service?.name}`}
+        className="text-gray-700 font-medium text-sm truncate pr-2"
+      >
         {service?.name}
       </td>
       <td className="flex flex-col" title={`${service?.formattedDate}`}>
@@ -58,7 +61,10 @@ const TableRow: React.FC<TableRowProps> = ({ service, header = false }) => {
         </small>
       </td>
       <td>
-        <p title={service?.lab} className="pr-2 truncate">
+        <p
+          title={service?.lab}
+          className="text-gray-700 font-medium text-sm truncate pr-2"
+        >
           Pucci Dental Lab
         </p>
       </td>

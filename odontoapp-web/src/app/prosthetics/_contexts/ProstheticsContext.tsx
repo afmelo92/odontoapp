@@ -2,10 +2,14 @@
 
 import { createContext, useReducer } from "react";
 import { PaginationStateProps } from "@/app/_components/Pagination";
+import {
+  Patient,
+  patientsMock,
+} from "@/app/patients/_contexts/PatientsContext";
 
 export type ProstheticsService = {
   id: number;
-  patient: string;
+  patient: Patient;
   age: number;
   sex: "M" | "F";
   name: string;
@@ -32,7 +36,7 @@ export type ActionProps = {
 const mock: ProstheticsService[] = [
   {
     id: 1,
-    patient: "Augustus",
+    patient: patientsMock[0],
     age: 61,
     sex: "M",
     name: "Facetas em dissilicato de lítio",
@@ -43,7 +47,7 @@ const mock: ProstheticsService[] = [
   },
   {
     id: 2,
-    patient: "Tiberius",
+    patient: patientsMock[1],
     age: 64,
     sex: "M",
     name: "Coroa metalocerâmica sobre implante",
@@ -54,7 +58,7 @@ const mock: ProstheticsService[] = [
   },
   {
     id: 3,
-    patient: "Publius Helvius Pertinax",
+    patient: patientsMock[2],
     age: 62,
     sex: "M",
     name: "Adesiva",
@@ -65,7 +69,7 @@ const mock: ProstheticsService[] = [
   },
   {
     id: 4,
-    patient: "Lucius Verus",
+    patient: patientsMock[3],
     age: 44,
     sex: "M",
     name: "Onlay/Inlay/Overlay",
@@ -76,7 +80,7 @@ const mock: ProstheticsService[] = [
   },
   {
     id: 5,
-    patient: "Septimius Severus",
+    patient: patientsMock[4],
     age: 50,
     sex: "M",
     name: "Provisório",
@@ -87,7 +91,7 @@ const mock: ProstheticsService[] = [
   },
   {
     id: 6,
-    patient: "Marcus Aurelius",
+    patient: patientsMock[5],
     age: 33,
     sex: "M",
     name: "Placa de clareamento",
@@ -98,7 +102,7 @@ const mock: ProstheticsService[] = [
   },
   {
     id: 7,
-    patient: "Julius Caesar",
+    patient: patientsMock[6],
     age: 30,
     sex: "M",
     name: "Planejamento digital",
@@ -109,7 +113,7 @@ const mock: ProstheticsService[] = [
   },
   {
     id: 8,
-    patient: "Galerius Valerius Maximinus",
+    patient: patientsMock[7],
     age: 39,
     sex: "M",
     name: "Mockup + guias de desgaste",
@@ -202,7 +206,9 @@ function reducer(state: StateProps, action: ActionProps) {
         data !== ""
           ? state.services.filter(
               (service) =>
-                service.patient.toLowerCase().includes(data.toLowerCase()) ||
+                service.patient.name
+                  .toLowerCase()
+                  .includes(data.toLowerCase()) ||
                 service.name.toLowerCase().includes(data.toLowerCase()) ||
                 service?.formattedDate
                   ?.toLowerCase()
