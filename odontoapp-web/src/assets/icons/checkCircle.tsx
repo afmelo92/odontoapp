@@ -1,6 +1,6 @@
 import { SVGAttributes } from "react";
 
-export function ChevronLeftIcon(props: SVGAttributes<SVGElement>) {
+export function CheckCircleIcon(props: SVGAttributes<SVGElement>) {
   return (
     <svg
       fill="none"
@@ -14,7 +14,7 @@ export function ChevronLeftIcon(props: SVGAttributes<SVGElement>) {
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
-        d="M15.75 19.5L8.25 12l7.5-7.5"
+        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
       />
     </svg>
   );
