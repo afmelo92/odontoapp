@@ -19,27 +19,33 @@ const mock = [
   },
   {
     id: 3,
+    title: "Customers",
+    href: "/customers",
+    icon: "users",
+  },
+  {
+    id: 4,
     title: "Dashboard",
     href: "/",
     icon: "squares2x2",
   },
   {
-    id: 4,
+    id: 5,
     title: "Prosthetics",
     href: "/prosthetics",
     icon: "tooth",
-  },
-  {
-    id: 5,
-    title: "Admin",
-    href: "/admin",
-    icon: "wrench-screwdriver",
   },
   {
     id: 6,
     title: "Shop",
     href: "/shop",
     icon: "shopping-cart",
+  },
+  {
+    id: 7,
+    title: "Admin",
+    href: "/admin",
+    icon: "wrench-screwdriver",
   },
 ];
 
