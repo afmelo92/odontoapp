@@ -1,11 +1,15 @@
 "use client";
 
 import { PaginationStateProps } from "@/app/_components/Pagination";
+import {
+  Patient,
+  patientsMock,
+} from "@/app/patients/_contexts/PatientsContext";
 import { createContext, useReducer } from "react";
 
 export type Appointment = {
   id: number;
-  patient: string;
+  patient: Patient;
   age: number;
   sex: "M" | "F";
   reason: string;
@@ -24,7 +28,7 @@ export type StateProps = {
 const mock: Appointment[] = [
   {
     id: 1,
-    patient: "Augustus",
+    patient: patientsMock[0],
     age: 61,
     sex: "M",
     reason: "Canal",
@@ -33,16 +37,16 @@ const mock: Appointment[] = [
   },
   {
     id: 2,
-    patient: "Tiberius",
+    patient: patientsMock[1],
     age: 64,
     sex: "M",
     reason: "Avaliação",
     date: new Date("2023-06-16T15:30:00.000Z"),
-    confirmed: false,
+    confirmed: true,
   },
   {
     id: 3,
-    patient: "Publius Helvius Pertinax",
+    patient: patientsMock[2],
     age: 62,
     sex: "M",
     reason: "Extração",
@@ -51,7 +55,7 @@ const mock: Appointment[] = [
   },
   {
     id: 4,
-    patient: "Lucius Verus",
+    patient: patientsMock[3],
     age: 44,
     sex: "M",
     reason: "Facetas",
@@ -60,7 +64,7 @@ const mock: Appointment[] = [
   },
   {
     id: 5,
-    patient: "Septimius Severus",
+    patient: patientsMock[4],
     age: 50,
     sex: "M",
     reason: "Avaliação",
@@ -69,7 +73,7 @@ const mock: Appointment[] = [
   },
   {
     id: 6,
-    patient: "Marcus Aurelius",
+    patient: patientsMock[5],
     age: 33,
     sex: "M",
     reason: "Avaliação",
@@ -78,7 +82,7 @@ const mock: Appointment[] = [
   },
   {
     id: 7,
-    patient: "Julius Caesar",
+    patient: patientsMock[5],
     age: 30,
     sex: "M",
     reason: "Harmonização facial",
@@ -87,7 +91,7 @@ const mock: Appointment[] = [
   },
   {
     id: 8,
-    patient: "Galerius Valerius Maximinus",
+    patient: patientsMock[6],
     age: 39,
     sex: "M",
     reason: "Harmonização facial",
@@ -173,7 +177,7 @@ function reducer(state: StateProps, action: ActionProps) {
         data !== ""
           ? state.appointments.filter(
               (appointment) =>
-                appointment.patient
+                appointment.patient.name
                   .toLowerCase()
                   .includes(data.toLowerCase()) ||
                 appointment.reason.toLowerCase().includes(data.toLowerCase()) ||

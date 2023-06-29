@@ -22,7 +22,6 @@ const TableRow: React.FC<TableRowProps> = ({ appointment, header = false }) => {
       </thead>
     );
   }
-
   return (
     <tr
       key={appointment?.id}
@@ -30,27 +29,49 @@ const TableRow: React.FC<TableRowProps> = ({ appointment, header = false }) => {
     >
       <td
         className="flex flex-col"
-        title={`${appointment?.patient} :: ${appointment?.age} yo, ${
+        title={`${appointment?.patient.name} :: ${appointment?.age} yo, ${
           appointment?.sex === "M" ? "M" : "F"
-        }  ${appointment?.confirmed ? ":: Confirmed" : ""}`}
+        } ${
+          appointment?.patient.complete_bio
+            ? ":: Complete bio"
+            : ":: Incomplete bio"
+        }  ${appointment?.confirmed ? ":: Appointment Confirmed" : ""}`}
       >
         <p className="font-bold text-gray-950 flex gap-2 items-center">
-          {appointment?.patient}{" "}
-          {appointment?.confirmed && (
-            <span>
-              {getIcon({
-                name: "check",
-                className: "w-5 h-5 stroke-green-500",
-                strokeWidth: 2,
-              })}
-            </span>
-          )}
+          {appointment?.patient.name}{" "}
+          <span className="flex items-baseline">
+            {appointment?.confirmed && appointment.patient.complete_bio && (
+              <span>
+                {getIcon({
+                  name: "check-circle",
+                  className: "w-5 h-5 stroke-green-500",
+                  strokeWidth: 2,
+                })}
+              </span>
+            )}
+            {appointment?.confirmed && !appointment.patient.complete_bio ? (
+              <span>
+                {getIcon({
+                  name: "check",
+                  className: "w-5 h-5 stroke-green-500",
+                  strokeWidth: 2,
+                })}
+              </span>
+            ) : (
+              ""
+            )}
+          </span>
         </p>
         <small className="text-gray-500">
           {appointment?.age} yo, {appointment?.sex === "M" ? "Male" : "Female"}
         </small>
       </td>
-      <td title={`${appointment?.reason}`}>{appointment?.reason}</td>
+      <td
+        title={`${appointment?.reason}`}
+        className="text-gray-500 font-medium text-sm truncate pr-2"
+      >
+        {appointment?.reason}
+      </td>
       <td className="flex flex-col" title={`${appointment?.formattedDate}`}>
         <small className="text-gray-500">{appointment?.formattedDate}</small>
         <p className="text-base font-bold text-gray-950">

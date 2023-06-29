@@ -3,6 +3,7 @@
 import { useAppointments } from "../_hooks/useAppointments";
 import Pagination from "@/app/_components/Pagination";
 import TableRow from "./TableRow";
+import Link from "next/link";
 
 const Table: React.FC = () => {
   const { state, dispatch } = useAppointments();
@@ -23,9 +24,12 @@ const Table: React.FC = () => {
                   Oops! It looks like there is no appointments scheduled yet.
                   Maybe you need to register a patient.
                 </h1>
-                <button className="bg-blue-500 p-6 rounded-lg text-white font-medium hover:bg-blue-700 transition-colors">
+                <Link
+                  href="/patients"
+                  className="bg-blue-500 p-6 rounded-lg text-white font-medium hover:bg-blue-700 transition-colors"
+                >
                   Register patient now
-                </button>
+                </Link>
               </td>
             </tr>
           )}
