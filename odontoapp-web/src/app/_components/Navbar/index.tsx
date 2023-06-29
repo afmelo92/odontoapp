@@ -7,7 +7,7 @@ const Navbar: React.FC = () => {
       id="top-bar"
       className="col-span-2 flex items-center justify-between px-6"
     >
-      <div id="logo" className="">
+      <div id="logo" className="w-[72px]">
         {getIcon({
           name: "tooth",
           className:
