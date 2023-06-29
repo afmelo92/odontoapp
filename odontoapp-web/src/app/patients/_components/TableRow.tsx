@@ -1,24 +1,20 @@
 import { Patient } from "../_contexts/PatientsContext";
 import { getIcon } from "@/utils/getIcon";
+import { usePatients } from "../_hooks/usePatients";
 
 type TableRowProps = {
   patient?: Patient;
   header?: boolean;
+  // onScheduleAppointment: React.Dispatch<React.SetStateAction<boolean>>;
+  // eslint-disable-next-line no-unused-vars
+  onScheduleAppointment: (x: boolean) => void;
 };
 
-const TableRow: React.FC<TableRowProps> = ({ patient, header = false }) => {
-  if (header) {
-    return (
-      <thead>
-        <tr className="grid grid-cols-4 text-gray-500 border-b-2 border-b-gray-100 px-6 py-4 text-sm">
-          <th className="text-start">Patient</th>
-          <th className="text-start">Provider</th>
-          <th className="text-start">Appointment</th>
-          <th className="text-end">Actions</th>
-        </tr>
-      </thead>
-    );
-  }
+const TableRow: React.FC<TableRowProps> = ({
+  patient,
+  onScheduleAppointment,
+}) => {
+  const { dispatch } = usePatients();
 
   return (
     <tr
@@ -29,10 +25,19 @@ const TableRow: React.FC<TableRowProps> = ({ patient, header = false }) => {
         className="flex flex-col"
         title={`${patient?.name} :: ${patient?.age} yo, ${
           patient?.sex === "M" ? "M" : "F"
-        } `}
+        } ${patient?.complete_bio ? ":: Bio Confirmed" : ""}`}
       >
         <p className="font-bold text-gray-950 flex gap-2 items-center">
           {patient?.name}
+          {patient?.complete_bio && (
+            <span>
+              {getIcon({
+                name: "check",
+                className: "w-5 h-5 stroke-green-500",
+                strokeWidth: 2,
+              })}
+            </span>
+          )}
         </p>
         <small className="text-gray-500">
           {patient?.age} yo, {patient?.sex === "M" ? "Male" : "Female"}
@@ -46,17 +51,33 @@ const TableRow: React.FC<TableRowProps> = ({ patient, header = false }) => {
       </td>
       <td>
         {patient && patient?.next_appointments.length > 0 ? (
-          <p className="font-medium text-sm">
+          <p className="font-medium text-sm flex items-baseline gap-2">
             {new Intl.DateTimeFormat("pt-BR", {
               day: "2-digit",
               month: "short",
               year: "numeric",
             }).format(new Date(patient.next_appointments[0]))}
+
+            <span title="Edit apppointment date">
+              {getIcon({
+                name: "pencil",
+                className:
+                  "w-5 h-5 stroke-green-500 hover:cursor-pointer hover:stroke-green-700 transition-colors",
+                strokeWidth: 2,
+              })}
+            </span>
           </p>
         ) : (
           <button
-            className="group bg-green-100 p-4 rounded-xl hover:bg-green-200 transition-colors font-semibold text-xs text-green-500 hover:text-green-700 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+            className="group focus:outline-green-500 bg-green-100 p-4 rounded-xl hover:bg-green-200 transition-colors font-semibold text-xs text-green-500 hover:text-green-700 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
             title="Schedule appointment"
+            onClick={() => {
+              dispatch({
+                type: "SELECT_PATIENT",
+                payload: { data: patient?.id },
+              });
+              onScheduleAppointment(true);
+            }}
           >
             Schedule appointment
           </button>
@@ -65,7 +86,7 @@ const TableRow: React.FC<TableRowProps> = ({ patient, header = false }) => {
       <td className="flex items-center justify-end">
         <div className="flex gap-2">
           <button
-            className="group bg-green-100 p-4 rounded-xl hover:bg-green-200 transition-colors"
+            className="group focus:outline-green-500 bg-green-100 p-4 rounded-xl hover:bg-green-200 transition-colors"
             title="Visualize patient info"
           >
             {getIcon({
@@ -76,7 +97,7 @@ const TableRow: React.FC<TableRowProps> = ({ patient, header = false }) => {
             })}
           </button>
           <button
-            className="group bg-blue-100 p-4 rounded-xl hover:bg-blue-200 transition-colors"
+            className="group focus:outline-blue-500 bg-blue-100 p-4 rounded-xl hover:bg-blue-200 transition-colors"
             title="Talk to patient"
           >
             {getIcon({
@@ -87,7 +108,7 @@ const TableRow: React.FC<TableRowProps> = ({ patient, header = false }) => {
             })}
           </button>
           <button
-            className="group bg-red-100 p-4 rounded-xl hover:bg-red-200 transition-colors"
+            className="group focus:outline-red-500 bg-red-100 p-4 rounded-xl hover:bg-red-200 transition-colors"
             title="Delete patient"
           >
             {getIcon({

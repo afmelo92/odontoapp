@@ -10,12 +10,14 @@ export type Patient = {
   sex: "M" | "F";
   next_appointments: string[];
   confirmed: boolean;
+  complete_bio: boolean;
 };
 
 export type StateProps = {
   searchData: string;
   patients: Patient[];
   filtered: Patient[];
+  selected: Patient | null;
   pagination: {
     index: number;
     perPage: number;
@@ -26,15 +28,16 @@ export type StateProps = {
   };
 };
 
-const mock: Patient[] = [
+export const patientsMock: Patient[] = [
   {
     id: 1,
     name: "Augustus",
     age: 61,
     sex: "M",
     next_appointments: [new Date("06/21/2023").toString()],
-    doctor: "Dra. Daiane Celeri",
+    doctor: "Dra. Daiane Odontoapp",
     confirmed: true,
+    complete_bio: true,
   },
   {
     id: 2,
@@ -42,8 +45,9 @@ const mock: Patient[] = [
     age: 64,
     sex: "M",
     next_appointments: [],
-    doctor: "Dra. Daiane Celeri",
+    doctor: "Dra. Daiane Odontoapp",
     confirmed: false,
+    complete_bio: false,
   },
   {
     id: 3,
@@ -51,8 +55,9 @@ const mock: Patient[] = [
     age: 62,
     sex: "M",
     next_appointments: [],
-    doctor: "Dra. Daiane Celeri",
+    doctor: "Dra. Daiane Odontoapp",
     confirmed: true,
+    complete_bio: true,
   },
   {
     id: 4,
@@ -60,8 +65,9 @@ const mock: Patient[] = [
     age: 44,
     sex: "M",
     next_appointments: [],
-    doctor: "Dra. Daiane Celeri",
+    doctor: "Dra. Daiane Odontoapp",
     confirmed: false,
+    complete_bio: true,
   },
   {
     id: 5,
@@ -69,8 +75,9 @@ const mock: Patient[] = [
     age: 50,
     sex: "M",
     next_appointments: [],
-    doctor: "Dra. Daiane Celeri",
+    doctor: "Dra. Daiane Odontoapp",
     confirmed: false,
+    complete_bio: false,
   },
   {
     id: 6,
@@ -78,8 +85,9 @@ const mock: Patient[] = [
     age: 33,
     sex: "M",
     next_appointments: [],
-    doctor: "Dra. Daiane Celeri",
+    doctor: "Dra. Daiane Odontoapp",
     confirmed: true,
+    complete_bio: true,
   },
   {
     id: 7,
@@ -87,8 +95,9 @@ const mock: Patient[] = [
     age: 30,
     sex: "M",
     next_appointments: [],
-    doctor: "Dra. Daiane Celeri",
+    doctor: "Dra. Daiane Odontoapp",
     confirmed: false,
+    complete_bio: false,
   },
   {
     id: 8,
@@ -96,20 +105,22 @@ const mock: Patient[] = [
     age: 30,
     sex: "M",
     next_appointments: [],
-    doctor: "Dra. Daiane Celeri",
+    doctor: "Dra. Daiane Odontoapp",
     confirmed: false,
+    complete_bio: true,
   },
 ];
 
 export type ActionProps = {
-  type: "SET_NEXT_PAGE" | "SET_PREV_PAGE" | "FILTER_DATA";
+  type: "SET_NEXT_PAGE" | "SET_PREV_PAGE" | "FILTER_DATA" | "SELECT_PATIENT";
   payload?: any;
 };
 
 const initialState = {
   searchData: "",
-  patients: mock,
+  patients: patientsMock,
   filtered: [],
+  selected: null,
   pagination: {
     index: 0,
     perPage: 6,
@@ -193,6 +204,20 @@ function reducer(state: StateProps, action: ActionProps) {
           totalPages: totalFilteredPages,
           next: hasNext,
           prev: hasPrev,
+        },
+      };
+    }
+    case "SELECT_PATIENT": {
+      const {
+        payload: { data },
+      } = action;
+
+      return {
+        ...state,
+        selected:
+          state.patients.filter((patient) => patient.id === data)[0] || null,
+        pagination: {
+          ...state.pagination,
         },
       };
     }

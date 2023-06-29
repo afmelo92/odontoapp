@@ -3,18 +3,29 @@
 import { usePatients } from "../_hooks/usePatients";
 import Pagination from "@/app/_components/Pagination";
 import TableRow from "./TableRow";
+import TableHeader from "./TableHeader";
 
-const Table: React.FC = () => {
+type TableProps = {
+  // onScheduleAppointment: React.Dispatch<React.SetStateAction<boolean>>;
+  // eslint-disable-next-line no-unused-vars
+  onScheduleAppointment: (x: boolean) => void;
+};
+
+const Table: React.FC<TableProps> = ({ onScheduleAppointment }) => {
   const { state, dispatch } = usePatients();
 
   return (
     <>
       <table className="h-full max-h-full w-full">
-        <TableRow header />
+        <TableHeader />
         <tbody className="grid grid-rows-6 grid-cols-1 h-full">
           {state.filtered.length > 0 ? (
             state.filtered.map((patient) => (
-              <TableRow key={patient.id} patient={patient} />
+              <TableRow
+                key={patient.id}
+                patient={patient}
+                onScheduleAppointment={onScheduleAppointment}
+              />
             ))
           ) : (
             <tr className="row-span-full h-full">
