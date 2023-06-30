@@ -1,0 +1,23 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+  app:
+    container_name: odontoapp-app
+    ports:
+      - 3333:3333
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: deploy
+    depends_on:
+      - db
+  db:
+    container_name: odontoapp-db
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: odontoapp
+      POSTGRES_DB: odontoapp
