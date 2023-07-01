@@ -1,4 +1,9 @@
 import { Request, Response, Router } from 'express';
+import UsersController from './controllers/UsersController';
+
+export interface TypedRequestBody<T> extends Express.Request {
+  body: T;
+}
 
 const router = Router();
 
@@ -16,8 +21,6 @@ router.post('/session/forgot-password', (req: Request, res: Response) => {
 });
 
 // USERS
-router.post('/users', (req: Request, res: Response) => {
-  res.json({ ok: '/' });
-});
+router.post('/users', UsersController.create);
 
 export default router;
