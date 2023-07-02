@@ -5,7 +5,8 @@ interface ControlledSelectProps
   label?: string;
   options: Array<{ value: any; text: string }>;
   defaultLabel?: string;
-  requierd?: boolean;
+  required?: boolean;
+  sizeType?: "sm" | "base" | "lg";
 }
 
 const ControlledSelect = forwardRef<HTMLSelectElement, ControlledSelectProps>(
@@ -16,6 +17,7 @@ const ControlledSelect = forwardRef<HTMLSelectElement, ControlledSelectProps>(
       options,
       defaultLabel = "Choose Option",
       required = false,
+      sizeType = "base",
       ...rest
     },
     ref
@@ -31,7 +33,9 @@ const ControlledSelect = forwardRef<HTMLSelectElement, ControlledSelectProps>(
         <div id="select-container" className="relative flex items-center gap-2">
           <span className="sr-only">{label}</span>
           <select
-            className="w-full block py-2 px-4 bg-white outline-none border-gray-400 focus:border-blue-500 rounded-xl border-2"
+            className={`w-full block py-2 px-4 bg-white outline-none border-gray-400 focus:border-blue-500 rounded-xl ${
+              sizeType === "base" ? "py-2" : "py-3"
+            } border-2`}
             {...rest}
             ref={ref}
           >

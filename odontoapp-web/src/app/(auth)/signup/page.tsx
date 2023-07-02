@@ -3,6 +3,7 @@ import ControlledInput from "@/app/_components/ControlledInput";
 import { getIcon } from "@/utils/getIcon";
 import { Controller, useForm } from "react-hook-form";
 import Link from "next/link";
+import ControlledSelect from "@/app/_components/ControlledSelect";
 
 type SignUpInputs = {
   fullName: string;
@@ -10,6 +11,7 @@ type SignUpInputs = {
   email: string;
   password: string;
   confirm_password: string;
+  account_type: string;
 };
 
 const SignUpPage: React.FC = () => {
@@ -20,6 +22,7 @@ const SignUpPage: React.FC = () => {
       email: "",
       password: "",
       confirm_password: "",
+      account_type: "",
     },
   });
 
@@ -45,7 +48,7 @@ const SignUpPage: React.FC = () => {
                 <ControlledInput
                   {...field}
                   type="text"
-                  label="Fullname"
+                  label="Name"
                   placeholder="John Doe"
                   required
                   leftIcon="user"
@@ -65,6 +68,25 @@ const SignUpPage: React.FC = () => {
                   required
                   leftIcon="building-office"
                   sizeType="lg"
+                />
+              )}
+            />
+            <Controller
+              name="account_type"
+              control={control}
+              render={({ field }) => (
+                <ControlledSelect
+                  {...field}
+                  label="Account type"
+                  placeholder="123.456.789-55 or 11.222.333/0001-55"
+                  required
+                  // leftIcon="building-office"
+                  defaultLabel="Choose account type"
+                  sizeType="lg"
+                  options={[
+                    { value: 1, text: "Dental Clinic" },
+                    { value: 2, text: "Prosthetic Lab" },
+                  ]}
                 />
               )}
             />
