@@ -11,6 +11,11 @@ type FindByEmailProps = {
   select?: Prisma.UsersSelect;
 };
 
+type FindByCPFCNPJProps = {
+  cpf_cnpj: Required<string>;
+  select?: Prisma.UsersSelect;
+};
+
 export const safeUserSelectSet: Prisma.UsersSelect = {
   uid: true,
   name: true,
@@ -38,6 +43,20 @@ class UsersRepository {
     const user = await prisma.users.findUnique({
       where: {
         email,
+      },
+      select,
+    });
+
+    return user;
+  }
+
+  async findByCPFCNPJ({
+    cpf_cnpj,
+    select = safeUserSelectSet,
+  }: FindByCPFCNPJProps) {
+    const user = await prisma.users.findFirst({
+      where: {
+        cpf_cnpj,
       },
       select,
     });

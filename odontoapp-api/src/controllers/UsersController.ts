@@ -57,6 +57,16 @@ class UsersController {
       });
     }
 
+    const checkCPFCNPJisAlreadyUsed = await UsersRepository.findByCPFCNPJ({
+      cpf_cnpj,
+    });
+
+    if (checkCPFCNPJisAlreadyUsed) {
+      return res.status(400).json({
+        message: 'CPF/CNPJ already used.',
+      });
+    }
+
     const checkEmailAlreadyUsed = await UsersRepository.findByEmail({ email });
 
     if (checkEmailAlreadyUsed) {
