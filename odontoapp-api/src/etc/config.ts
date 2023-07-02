@@ -7,4 +7,8 @@ export default {
   hash: {
     salt: 8,
   },
+  jwt: {
+    secret: 'default',
+    expiresIn: '1y',
+  },
 };

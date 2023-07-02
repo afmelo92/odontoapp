@@ -160,14 +160,101 @@ describe('/users', () => {
         account_type: 1,
       });
 
-      const data = response.body.data;
-
       expect(response.statusCode).toEqual(201);
       expect(response.headers['content-type']).toMatch(/json/);
+      expect(Object.keys(response.body.data).sort()).toEqual(
+        [
+          'uid',
+          'name',
+          'email',
+          'active',
+          'address',
+          'company',
+          'cpf_cnpj',
+          'cro',
+          'phone',
+          'cellphone',
+        ].sort()
+      );
+      expect(response.body.message).toEqual('ok');
+    });
+  });
+
+  describe('/session :: POST', () => {
+    it('should return 400 and error message when one or more required fields are not sent', async () => {
+      const response = await request(myAppInstance)
+        .post('/session')
+        .send({ email: 'John Doe' });
+
+      expect(response.statusCode).toEqual(400);
+      expect(response.headers['content-type']).toMatch(/json/);
+      expect(response.body).toEqual({
+        message: 'Email/Password required.',
+      });
+    });
+
+    it('should return 400 and error message when invalid email is sent', async () => {
+      const response = await request(myAppInstance)
+        .post('/session')
+        .send({ email: 'John Doe', password: '123123' });
+
+      expect(response.statusCode).toEqual(400);
+      expect(response.headers['content-type']).toMatch(/json/);
+      expect(response.body).toEqual({
+        message: 'Invalid e-mail.',
+      });
+    });
+
+    it('should return 400 and error message when email does not have associated user', async () => {
+      const response = await request(myAppInstance)
+        .post('/session')
+        .send({ email: 'jane@email.com', password: '123123' });
+
+      expect(response.statusCode).toEqual(400);
+      expect(response.headers['content-type']).toMatch(/json/);
+      expect(response.body).toEqual({
+        message: 'Email/Password does not match.',
+      });
+    });
+
+    it('should return 400 and error message when password is incorrect', async () => {
+      const response = await request(myAppInstance)
+        .post('/session')
+        .send({ email: testDBUser.email, password: 'invalid password' });
+
+      expect(response.statusCode).toEqual(400);
+      expect(response.headers['content-type']).toMatch(/json/);
+      expect(response.body).toEqual({
+        message: 'Email/Password does not match.',
+      });
+    });
+
+    it("should return 200 and 'ok' message when email and password are correct", async () => {
+      const response = await request(myAppInstance)
+        .post('/session')
+        .send({ email: testDBUser.email, password: '123123' });
+
+      expect(response.statusCode).toEqual(200);
+      expect(response.headers['content-type']).toMatch(/json/);
+      expect(Object.keys(response.body.data.user).sort()).toEqual(
+        [
+          'id',
+          'email',
+          'name',
+          'cro',
+          'cpf_cnpj',
+          'cellphone',
+          'phone',
+          'company',
+          'address',
+          'role',
+        ].sort()
+      );
       expect(response.body).toEqual({
         message: 'ok',
         data: {
-          ...data,
+          user: response.body.data.user,
+          token: response.body.data.token,
         },
       });
     });

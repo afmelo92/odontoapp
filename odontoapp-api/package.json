@@ -7,7 +7,8 @@
     "dev": "tsx watch ./src",
     "pre:test": "docker compose up test-db -d && dotenv -e ./.env.test prisma migrate deploy",
     "test": "pnpm pre:test && vitest",
-    "build": "tsup"
+    "build": "tsup",
+    "start": "node ./dist"
   },
   "tsup": {
     "entry": [
@@ -31,12 +32,14 @@
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",
     "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.0",
     "prisma": "^4.16.2",
     "winston": "^3.9.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/express": "^4.17.17",
+    "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^20.3.2",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.60.1",
