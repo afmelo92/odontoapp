@@ -21,3 +21,13 @@ services:
     environment:
       POSTGRES_PASSWORD: odontoapp
       POSTGRES_DB: odontoapp
+  test-db:
+    container_name: odontoapp-test-db
+    image: postgres
+    restart: always
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma
+      POSTGRES_DB: tests

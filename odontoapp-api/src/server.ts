@@ -22,18 +22,20 @@ class Server {
     this.server = null;
   }
 
-  public async init(): Promise<void> {
+  public async init(): Promise<HTTPServer> {
     this.routesSetup();
-    this.listen(() => {
-      logger.log({
-        level: 'info',
-        message: `Listening at ${this.port}`,
-      });
+    return this.listen(() => {
+      if (process.env.NODE_ENV !== 'test') {
+        logger.log({
+          level: 'info',
+          message: `Listening at ${this.port}`,
+        });
+      }
     });
   }
 
-  private listen(cb: () => void): void {
-    this.server = this.app.listen(this.port, cb);
+  private listen(cb: () => void): HTTPServer {
+    return (this.server = this.app.listen(this.port, cb));
   }
 
   private routesSetup(): void {
@@ -47,7 +49,12 @@ class Server {
 
   public close() {
     this.server?.close(() => {
-      console.log('closing connections...');
+      if (process.env.NODE_ENV !== 'test') {
+        logger.log({
+          level: 'info',
+          message: `closing connections...`,
+        });
+      }
     });
     process.exitCode = 0;
   }
