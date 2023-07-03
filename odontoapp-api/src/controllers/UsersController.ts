@@ -17,8 +17,14 @@ type CreateUserBody = {
 
 class UsersController {
   async create(req: TypedRequestBody<CreateUserBody>, res: Response) {
-    const { name, email, cpf_cnpj, password, confirm_password, account_type } =
-      req.body;
+    const {
+      name = '',
+      email = '',
+      cpf_cnpj = '',
+      password = '',
+      confirm_password = '',
+      account_type,
+    } = req.body;
 
     if (
       !name ||
@@ -30,40 +36,51 @@ class UsersController {
     ) {
       return res.status(400).json({
         message: 'All fields required.',
+        fields: [
+          ...Object.entries(req.body)
+            .map(([key, value]) => (Boolean(value) === false ? key : null))
+            .filter(Boolean),
+        ],
       });
     }
 
     if (password != confirm_password) {
       return res.status(400).json({
         message: 'Password/Confirm password must match.',
+        fields: ['password', 'confirm_password'],
       });
     }
 
     if (account_type < 1 || account_type > 2) {
       return res.status(400).json({
         message: 'Invalid account type.',
+        fields: ['account_type'],
       });
     }
 
     if (!valida_cpf_cnpj(cpf_cnpj)) {
       return res.status(400).json({
         message: 'Invalid CPF/CNPJ.',
+        fields: ['cpf_cnpj'],
       });
     }
 
     if (!validateEmail(email)) {
       return res.status(400).json({
         message: 'Invalid e-mail.',
+        fields: ['email'],
       });
     }
+    const sanitizedCPFCNPJ = cpf_cnpj.replace(/[^0-9]/g, '');
 
     const checkCPFCNPJisAlreadyUsed = await UsersRepository.findByCPFCNPJ({
-      cpf_cnpj,
+      cpf_cnpj: sanitizedCPFCNPJ,
     });
 
     if (checkCPFCNPJisAlreadyUsed) {
       return res.status(400).json({
         message: 'CPF/CNPJ already used.',
+        fields: ['cpf_cnpj'],
       });
     }
 
@@ -72,10 +89,9 @@ class UsersController {
     if (checkEmailAlreadyUsed) {
       return res.status(400).json({
         message: 'E-mail already used.',
+        fields: ['email'],
       });
     }
-
-    const sanitizedCPFCNPJ = cpf_cnpj.replace(/[^0-9]/g, '');
 
     const userRole = setAccountType(account_type);
 
