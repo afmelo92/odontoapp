@@ -8,6 +8,8 @@ interface ControlledInputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
   required?: boolean;
   sizeType?: "sm" | "base" | "lg";
+  loading?: boolean;
+  error?: string;
 }
 
 const ControlledInput = forwardRef<HTMLInputElement, ControlledInputProps>(
@@ -19,6 +21,8 @@ const ControlledInput = forwardRef<HTMLInputElement, ControlledInputProps>(
       rightIcon,
       required = false,
       sizeType = "base",
+      loading = false,
+      error = "",
       ...rest
     },
     ref
@@ -33,7 +37,16 @@ const ControlledInput = forwardRef<HTMLInputElement, ControlledInputProps>(
         )}
         <div
           id="input-container"
-          className="relative flex items-center gap-2 caret-blue-500 stroke-gray-400 focus-within:stroke-blue-500"
+          data-error={Boolean(error)}
+          data-loading={loading}
+          className={`group relative flex items-center gap-2 
+            caret-blue-500 
+            stroke-gray-400
+            focus-within:stroke-blue-500
+            data-[loading=true]:stroke-gray-500 
+            data-[loading=true]:border-gray-500
+            data-[error=true]:stroke-red-500
+          `}
         >
           <span className="sr-only">{label}</span>
           {leftIcon && (
@@ -46,13 +59,24 @@ const ControlledInput = forwardRef<HTMLInputElement, ControlledInputProps>(
             </span>
           )}
           <input
+            disabled={loading}
             className={`w-full ${leftIcon ? "pl-8" : "pl-4"} ${
               rightIcon ? "pr-8" : "pr-4"
-            } ${
-              sizeType === "base" ? "py-2" : "py-3"
-            } border-2 border-gray-400 rounded-xl outline-2 focus:outline-blue-500 placeholder:text-gray-400 block`}
+            } ${sizeType === "base" ? "py-2" : "py-3"} 
+            rounded-xl border-2 
+            border-gray-400 
+            placeholder:text-gray-400 block
+            focus:outline-blue-500
+            focus:stroke-blue-500
+            group-data-[loading=true]:focus:outline-gray-900 
+            group-data-[loading=true]:bg-gray-300 
+            group-data-[loading=true]:text-gray-500
+              group-data-[loading=true]:cursor-not-allowed
+              group-data-[error=true]:outline-none
+            group-data-[error=true]:border-red-500
+            group-data-[error=true]:text-red-500
+             `}
             {...rest}
-            // required={required}
             ref={ref}
           />
           {rightIcon && (
@@ -65,6 +89,9 @@ const ControlledInput = forwardRef<HTMLInputElement, ControlledInputProps>(
             </span>
           )}
         </div>
+        {error && (
+          <small className="text-xs font-normal text-red-500">{error}</small>
+        )}
       </div>
     );
   }

@@ -1,3 +1,5 @@
+"use client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 
 type AuthGroupLayoutProps = {
@@ -5,12 +7,16 @@ type AuthGroupLayoutProps = {
 };
 
 const AuthGroupLayout: React.FC<AuthGroupLayoutProps> = ({ children }) => {
+  const queryClient = new QueryClient();
+
   return (
-    <section className="h-screen w-screen flex items-center justify-center">
-      <div className="container h-full grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-1">
-        {children}
-      </div>
-    </section>
+    <QueryClientProvider client={queryClient}>
+      <section className="h-screen w-screen flex items-center justify-center">
+        <div className="container h-full grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-1">
+          {children}
+        </div>
+      </section>
+    </QueryClientProvider>
   );
 };
 
