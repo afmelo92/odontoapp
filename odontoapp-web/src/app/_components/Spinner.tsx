@@ -1,17 +1,21 @@
 import React from "react";
 
 type SpinnerProps = {
-  className?: string;
+  size?: string;
+  fill?: string;
+  trail?: string;
 };
 
 const Spinner: React.FC<SpinnerProps> = ({
-  className = "w-8 h-8 fill-blue-500",
+  size = "w-8 h-8",
+  fill = "fill-blue-500",
+  trail = "text-gray-200",
 }) => {
   return (
     <div role="status">
       <svg
         aria-hidden="true"
-        className={`inline mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-none ${className}`}
+        className={`inline mr-2 animate-spin ${size} ${fill} ${trail}`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

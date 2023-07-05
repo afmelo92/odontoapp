@@ -22,7 +22,7 @@ const Button: React.FC<ButtonProps> = ({
       className={`w-full flex items-center justify-center transition-colors p-4 rounded-xl font-semibold
       bg-blue-500 
       hover:bg-blue-700 
-      text-white 
+      text-white
       focus:outline-blue-900 
       disabled:bg-gray-500 
         disabled:cursor-not-allowed
@@ -31,7 +31,7 @@ const Button: React.FC<ButtonProps> = ({
       {...rest}
     >
       {loading ? (
-        <Spinner className="h-6 w-6 fill-blue-500 dark:text-gray-200" />
+        <Spinner size="w-6 h-6" fill="fill-blue-500" trail="text-gray-200" />
       ) : (
         <p>{label}</p>
       )}
@@ -40,3 +40,5 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 export default Button;
+
+<Spinner size="w-24 h-24" fill="fill-blue-700" trail="text-blue-200" />;

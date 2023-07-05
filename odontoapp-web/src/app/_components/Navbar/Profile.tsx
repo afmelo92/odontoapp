@@ -1,8 +1,15 @@
+"use client";
+import { SessionUser } from "@/pages/api/auth/[...nextauth]";
 import { getIcon } from "@/utils/getIcon";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 
 const Profile: React.FC = () => {
+  const session = useSession();
+
+  const userData = (session.data?.user as SessionUser) || null;
+
   return (
     <div className="w-full flex justify-between">
       <div
@@ -14,7 +21,7 @@ const Profile: React.FC = () => {
           className: "w-6 h-6",
           strokeWidth: 2,
         })}
-        <p>Odontoapp Odontologia</p>
+        <p>{userData?.company || `${userData?.name || "user"}'s clinic`}</p>
       </div>
       <div id="profile" className="flex gap-4 items-center">
         <Link
@@ -35,8 +42,10 @@ const Profile: React.FC = () => {
         </Link>
         <div id="profile-button" className="flex gap-2 items-center group">
           <div className="flex flex-col justify-center">
-            <small className="text-gray-400">Bem-vindo,</small>
-            <strong className="font-semibold text-gray-700">Andre Melo</strong>
+            <small className="text-gray-400">Welcome,</small>
+            <strong className="font-semibold text-gray-700">{`${
+              userData?.name || "User"
+            }`}</strong>
           </div>
           <Link
             href="/profile"

@@ -59,6 +59,7 @@ import { T47 } from "@/assets/toothMap/t47";
 import { T48 } from "@/assets/toothMap/t48";
 import { BuildingOfficeIcon } from "@/assets/icons/buildingOffice";
 import { LockClosedIcon } from "@/assets/icons/lockClosed";
+import { PowerIcon } from "@/assets/icons/power";
 
 type Props = {
   name: string;
@@ -126,6 +127,8 @@ export function getIcon({ name, ...rest }: Props) {
       return <BuildingOfficeIcon {...rest} />;
     case "lock-closed":
       return <LockClosedIcon {...rest} />;
+    case "power":
+      return <PowerIcon {...rest} />;
     case "t11":
       return <T11 {...rest} />;
     case "t12":
