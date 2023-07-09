@@ -48,7 +48,7 @@ model Companies {
   cnpj String? @unique
   cellphone String?
   phone String?
-  owner  Users  @relation("owner", fields: [owner_id], references: [id])
+  owner  Users  @relation("owner", fields: [owner_id], references: [id], onDelete: Cascade)
   owner_id Int @unique
   employees Users[]
   address String?
