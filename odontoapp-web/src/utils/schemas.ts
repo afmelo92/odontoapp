@@ -3,11 +3,11 @@ import * as yup from "yup";
 const signUpSchema = yup
   .object({
     name: yup.string().required(),
-    cpf_cnpj: yup
+    cpf: yup
       .string()
       .matches(
         /(^\d{3}\.\d{3}\.\d{3}\-\d{2}$)|(^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$)/,
-        "Allowed 123.456.789-55 or 11.222.333/0001-55"
+        "Allowed 123.456.789-55"
       )
       .required(),
     email: yup.string().email().required(),
@@ -24,4 +24,70 @@ const signUpSchema = yup
   })
   .required();
 
-export { signUpSchema };
+const signInSchema = yup
+  .object({
+    email: yup.string().email().required(),
+    password: yup.string().required(),
+  })
+  .required();
+
+const updateUserProfileSchema = yup.object({
+  user_address: yup.string(),
+  user_birth: yup.string(),
+  user_company: yup.string(),
+  user_cpf: yup.string(),
+  user_email: yup.string().email(),
+  user_confirm_email: yup
+    .string()
+    .email()
+    .test("emails-match", "E-mails must match", function (value) {
+      return this.parent.user_email === value;
+    }),
+  user_name: yup.string(),
+  user_password: yup.string(),
+  user_confirm_password: yup
+    .string()
+    .test("passwords-match", "Passwords must match", function (value) {
+      return this.parent.user_password === value;
+    }),
+  user_post: yup.string(),
+  user_cro: yup.string(),
+});
+
+const updateCompanyProfileSchema = yup.object({
+  company_name: yup.string(),
+  company_cnpj: yup
+    .string()
+    .matches(
+      /([0-9]{2}[\.]?[0-9]{3}[\.]?[0-9]{3}[\/]?[0-9]{4}[-]?[0-9]{2})|([0-9]{3}[\.]?[0-9]{3}[\.]?[0-9]{3}[-]?[0-9]{2})/,
+      "Allowed 12.345.678/0001-11"
+    ),
+  company_address: yup.string(),
+  company_primary_email: yup.string().email(),
+  company_secondary_email: yup
+    .string()
+    .email()
+    .test(
+      "company-emails-must-not-match",
+      "Primary and secondary emails must be differents",
+      function (value) {
+        return this.parent.company_primary_email !== value || value === "";
+      }
+    ),
+  company_cellphone: yup
+    .string()
+    .matches(
+      /^(?:(?:\+|00)?(55)\s?)?(?:\(?([1-9][0-9])\)?\s?)(?:((?:9\s?\d|[2-9])\d{3})\-?(\d{4}))$/,
+      "Allowed 55 11 9 9123-1234"
+    ),
+
+  company_phone: yup.string(),
+  company_website: yup.string(),
+});
+
+export {
+  signUpSchema,
+  signInSchema,
+  updateUserProfileSchema,
+  updateCompanyProfileSchema,
+};

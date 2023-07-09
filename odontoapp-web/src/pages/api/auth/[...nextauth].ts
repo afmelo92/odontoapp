@@ -1,19 +1,31 @@
-import NextAuth, { NextAuthOptions, User } from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-
-export interface SessionUser extends User {
-  accessToken: string;
-  id: string;
-  email: string;
-  name: string;
-  cro: string | null;
-  cpf_cnpj: string;
-  cellphone: string | null;
-  phone: string | null;
-  company: string | null;
-  address: string | null;
-  role: string;
+export interface UpdateResponse extends Response {
+  data: SessionUpdateData;
 }
+
+export type SessionUpdateData = {
+  address: string | null;
+  birth: string | null;
+  cellphone: string | null;
+  cpf: string;
+  cro: string | null;
+  email: string;
+  uid: string;
+  post: string | null;
+  name: string;
+  phone: string | null;
+  company: {
+    address: string | null;
+    primary_email: string | null;
+    secondary_email: string | null;
+    cellphone: string | null;
+    cnpj: string | null;
+    name: string | null;
+    phone: string | null;
+    website: string | null;
+  } | null;
+};
 
 type LoginProps = {
   email: string;
@@ -64,14 +76,9 @@ const authOptions: NextAuthOptions = {
           }),
         });
 
+        const parsed = await response.json();
+
         if (response.ok) {
-          const parsed = await response.json();
-
-          console.dir(
-            { nextAuthResponse: parsed },
-            { colors: true, depth: null }
-          );
-
           const { user, token: accessToken } = parsed.data;
 
           return { accessToken, ...user };
@@ -82,41 +89,82 @@ const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ credentials, account, user }) {
-      console.dir(
-        { signInCredentials: credentials },
-        { colors: true, depth: null }
-      );
-      console.dir({ signInAccount: account }, { colors: true, depth: null });
-      console.dir({ signInUser: user }, { colors: true, depth: null });
-
+    async signIn() {
       return true;
     },
-    async jwt({ token, account, user, session, trigger }) {
-      console.dir(
-        {
-          tokenCBtoken: token,
-          tokenCBaccount: account,
-          tokenCBuser: user,
-          tokenCBsession: session,
-          tokenCBtrigger: trigger,
-        },
-        { colors: true, depth: null }
-      );
+    async jwt({ token, user, session, trigger }) {
+      const updatedSessionData = session as SessionUpdateData;
 
       if (user) {
-        token.user = user;
+        token.user = { ...user };
+      }
+
+      if (trigger === "update" && token.user) {
+        if (updatedSessionData?.name) {
+          token.user.name = updatedSessionData.name;
+        }
+
+        if (updatedSessionData?.email) {
+          token.user.email = updatedSessionData.email;
+        }
+
+        if (updatedSessionData?.address) {
+          token.user.address = updatedSessionData.address;
+        }
+
+        if (updatedSessionData?.post) {
+          token.user.post = updatedSessionData.post;
+        }
+
+        if (updatedSessionData?.cro) {
+          token.user.cro = updatedSessionData.cro;
+        }
+
+        if (updatedSessionData?.birth) {
+          token.user.birth = updatedSessionData.birth.split("T")[0];
+        }
+
+        if (token.user.company) {
+          if (updatedSessionData?.company?.address) {
+            token.user.company.address = updatedSessionData.company.address;
+          }
+
+          if (updatedSessionData?.company?.cnpj) {
+            token.user.company.cnpj = updatedSessionData.company.cnpj;
+          }
+
+          if (updatedSessionData?.company?.name) {
+            token.user.company.name = updatedSessionData.company.name;
+          }
+
+          if (updatedSessionData?.company?.primary_email) {
+            token.user.company.primary_email =
+              updatedSessionData.company.primary_email;
+          }
+
+          if (updatedSessionData?.company?.secondary_email) {
+            token.user.company.secondary_email =
+              updatedSessionData.company.secondary_email;
+          }
+
+          if (updatedSessionData?.company?.cellphone) {
+            token.user.company.cellphone = updatedSessionData.company.cellphone;
+          }
+
+          if (updatedSessionData?.company?.phone) {
+            token.user.company.phone = updatedSessionData.company.phone;
+          }
+
+          if (updatedSessionData?.company?.website) {
+            token.user.company.website = updatedSessionData.company.website;
+          }
+        }
       }
 
       return Promise.resolve(token);
     },
     async session({ session, token }) {
-      console.dir(
-        { sessionCBsession: session, sessionCBtoken: token },
-        { colors: true, depth: null }
-      );
-
-      session.user = token.user as SessionUser;
+      session.user = token.user;
 
       return Promise.resolve(session);
     },
@@ -124,5 +172,3 @@ const authOptions: NextAuthOptions = {
 };
 
 export default NextAuth(authOptions);
-
-// export { handler as GET, handler as POST };

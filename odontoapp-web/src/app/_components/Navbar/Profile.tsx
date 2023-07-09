@@ -1,5 +1,4 @@
 "use client";
-import { SessionUser } from "@/pages/api/auth/[...nextauth]";
 import { getIcon } from "@/utils/getIcon";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -8,7 +7,7 @@ import Link from "next/link";
 const Profile: React.FC = () => {
   const session = useSession();
 
-  const userData = (session.data?.user as SessionUser) || null;
+  const userData = session.data?.user || null;
 
   return (
     <div className="w-full flex justify-between">
@@ -21,7 +20,9 @@ const Profile: React.FC = () => {
           className: "w-6 h-6",
           strokeWidth: 2,
         })}
-        <p>{userData?.company || `${userData?.name || "user"}'s clinic`}</p>
+        <p>
+          {userData?.company?.name || `${userData?.name || "user"}'s clinic`}
+        </p>
       </div>
       <div id="profile" className="flex gap-4 items-center">
         <Link

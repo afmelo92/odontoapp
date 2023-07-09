@@ -3,7 +3,7 @@ import Button from "@/app/_components/Button";
 import ControlledInput from "@/app/_components/ControlledInput";
 import ControlledSelect from "@/app/_components/ControlledSelect";
 import { signUpMutation } from "@/services/mutations";
-import { cnpjMask, cpfMask } from "@/utils";
+import { cpfMask } from "@/utils";
 import APIError from "@/utils/APIError";
 import { getIcon } from "@/utils/getIcon";
 import { signUpSchema } from "@/utils/schemas";
@@ -15,7 +15,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
 export type SignUpInputs = {
   name: string;
-  cpf_cnpj: string;
+  cpf: string;
   email: string;
   password: string;
   confirm_password: string;
@@ -32,7 +32,7 @@ const SignUpForm: React.FC = () => {
   } = useForm<SignUpInputs>({
     defaultValues: {
       name: "",
-      cpf_cnpj: "",
+      cpf: "",
       email: "",
       password: "",
       confirm_password: "",
@@ -64,7 +64,7 @@ const SignUpForm: React.FC = () => {
   const onSubmit: SubmitHandler<SignUpInputs> = async (data) => {
     const formattedInput: SignUpInputs = {
       ...data,
-      cpf_cnpj: data.cpf_cnpj.replace(/\D+/g, ""),
+      cpf: data.cpf.replace(/\D+/g, ""),
     };
     await mutateAsync(formattedInput);
   };
@@ -103,24 +103,20 @@ const SignUpForm: React.FC = () => {
           )}
         />
         <Controller
-          name="cpf_cnpj"
+          name="cpf"
           control={control}
           render={({ field }) => (
             <ControlledInput
               {...field}
               type="text"
-              label="CPF/CNPJ"
-              placeholder="123.456.789-55 or 11.222.333/0001-55"
+              label="CPF"
+              placeholder="123.456.789-55"
               required
-              leftIcon="building-office"
+              leftIcon="identification"
               sizeType="lg"
               loading={isLoading}
-              value={
-                field.value.length >= 15
-                  ? cnpjMask(field.value)
-                  : cpfMask(field.value)
-              }
-              error={errors.cpf_cnpj?.message}
+              value={cpfMask(field.value)}
+              error={errors.cpf?.message}
             />
           )}
         />

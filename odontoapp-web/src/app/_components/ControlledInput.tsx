@@ -10,6 +10,8 @@ interface ControlledInputProps extends InputHTMLAttributes<HTMLInputElement> {
   sizeType?: "sm" | "base" | "lg";
   loading?: boolean;
   error?: string;
+  disabled?: boolean;
+  invisible?: boolean;
 }
 
 const ControlledInput = forwardRef<HTMLInputElement, ControlledInputProps>(
@@ -23,12 +25,17 @@ const ControlledInput = forwardRef<HTMLInputElement, ControlledInputProps>(
       sizeType = "base",
       loading = false,
       error = "",
+      disabled = false,
+      invisible = false,
       ...rest
     },
     ref
   ) => {
     return (
-      <div id="input-wrapper" className="group flex flex-col gap-2">
+      <div
+        id="input-wrapper"
+        className={`group flex flex-col gap-2 ${invisible && "invisible"}`}
+      >
         {label && (
           <label htmlFor={name} className="text-xs font-semibold text-gray-900">
             {label}{" "}
@@ -59,7 +66,7 @@ const ControlledInput = forwardRef<HTMLInputElement, ControlledInputProps>(
             </span>
           )}
           <input
-            disabled={loading}
+            disabled={loading || disabled}
             className={`w-full ${leftIcon ? "pl-8" : "pl-4"} ${
               rightIcon ? "pr-8" : "pr-4"
             } ${sizeType === "base" ? "py-2" : "py-3"} 
@@ -71,7 +78,10 @@ const ControlledInput = forwardRef<HTMLInputElement, ControlledInputProps>(
             group-data-[loading=true]:focus:outline-gray-900 
             group-data-[loading=true]:bg-gray-300 
             group-data-[loading=true]:text-gray-500
-              group-data-[loading=true]:cursor-not-allowed
+            disabled:focus:outline-gray-900 
+            disabled:bg-gray-300 
+            disabled:text-gray-500
+              disabled:cursor-not-allowed
               group-data-[error=true]:outline-none
             group-data-[error=true]:border-red-500
             group-data-[error=true]:text-red-500

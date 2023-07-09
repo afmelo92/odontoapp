@@ -1,36 +1,78 @@
+import Button from "@/app/_components/Button";
 import ControlledInput from "@/app/_components/ControlledInput";
-import ControlledSelect from "@/app/_components/ControlledSelect";
+import { UpdateResponse } from "@/pages/api/auth/[...nextauth]";
+import { updateUserMutation } from "@/services/mutations";
+import { cellphoneMask, cnpjMask } from "@/utils";
+import APIError from "@/utils/APIError";
+import { updateCompanyProfileSchema } from "@/utils/schemas";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useMutation } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
-import React from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
-type UpdateCompanyProfileInputs = {
+export type UpdateCompanyProfileInputs = {
   company_name: string;
   company_cnpj: string;
   company_address: string;
-  company_email: string;
-  company_extra_email: string;
+  company_primary_email: string;
+  company_secondary_email: string;
   company_cellphone: string;
+  company_phone: string;
   company_website: string;
-  company_type: string | number;
 };
 
 const UpdateCompanyProfileForm: React.FC = () => {
-  const { control, handleSubmit } = useForm<UpdateCompanyProfileInputs>({
+  const session = useSession();
+
+  const userData = session.data?.user || null;
+
+  const {
+    control,
+    handleSubmit,
+    setError,
+    formState: { errors, isDirty },
+  } = useForm<UpdateCompanyProfileInputs>({
     defaultValues: {
-      company_address: "",
-      company_cellphone: "",
-      company_cnpj: "",
-      company_email: "",
-      company_extra_email: "",
-      company_name: "",
-      company_type: "",
-      company_website: "",
+      company_address: userData?.company?.address || "",
+      company_cellphone: userData?.company?.cellphone || "",
+      company_phone: userData?.company?.phone || "",
+      company_cnpj: userData?.company?.cnpj || "",
+      company_primary_email: userData?.company?.primary_email || "",
+      company_secondary_email: userData?.company?.secondary_email || "",
+      company_name: userData?.company?.name || "",
+      company_website: userData?.company?.website || "",
+    },
+    resolver: yupResolver(updateCompanyProfileSchema),
+  });
+
+  const { mutateAsync, isLoading } = useMutation<
+    UpdateResponse,
+    APIError,
+    UpdateCompanyProfileInputs
+  >({
+    mutationFn: (data) => {
+      return updateUserMutation({
+        ...data,
+        user_id: userData?.id || "",
+        user_token: userData?.accessToken || "",
+      });
+    },
+    onSuccess: async (data) => {
+      // SHOW TOAST
+      const userResponseData = data.data;
+
+      await session.update({ ...userResponseData });
+    },
+    onError: (error) => {
+      // SHOW TOAST
+      console.log({ error });
+      error.setFormAPIErrors(error, setError);
     },
   });
 
-  const onSubmit: SubmitHandler<UpdateCompanyProfileInputs> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<UpdateCompanyProfileInputs> = async (data) => {
+    await mutateAsync(data);
   };
 
   return (
@@ -59,6 +101,8 @@ const UpdateCompanyProfileForm: React.FC = () => {
                   type="text"
                   label="Name"
                   placeholder="Odontoapp Odontologia"
+                  loading={isLoading}
+                  error={errors.company_name?.message}
                 />
               )}
             />
@@ -72,6 +116,9 @@ const UpdateCompanyProfileForm: React.FC = () => {
                   type="text"
                   label="CNPJ"
                   placeholder="55.444.333-0001/55"
+                  value={cnpjMask(field.value)}
+                  loading={isLoading}
+                  error={errors.company_cnpj?.message}
                 />
               )}
             />
@@ -85,12 +132,14 @@ const UpdateCompanyProfileForm: React.FC = () => {
                   type="text"
                   label="Address"
                   placeholder="John Doe Avenue 1560"
+                  loading={isLoading}
+                  error={errors.company_address?.message}
                 />
               )}
             />
 
             <Controller
-              name="company_email"
+              name="company_primary_email"
               control={control}
               render={({ field }) => (
                 <ControlledInput
@@ -98,12 +147,14 @@ const UpdateCompanyProfileForm: React.FC = () => {
                   type="email"
                   label="E-mail"
                   placeholder="john.doe@company.com"
+                  loading={isLoading}
+                  error={errors.company_primary_email?.message}
                 />
               )}
             />
 
             <Controller
-              name="company_extra_email"
+              name="company_secondary_email"
               control={control}
               render={({ field }) => (
                 <ControlledInput
@@ -111,6 +162,8 @@ const UpdateCompanyProfileForm: React.FC = () => {
                   type="email"
                   label="Extra email"
                   placeholder="john.doe.extra@company.com"
+                  loading={isLoading}
+                  error={errors.company_secondary_email?.message}
                 />
               )}
             />
@@ -121,9 +174,27 @@ const UpdateCompanyProfileForm: React.FC = () => {
               render={({ field }) => (
                 <ControlledInput
                   {...field}
-                  type="number"
+                  type="text"
                   label="Cellphone"
-                  placeholder="Your secret password"
+                  placeholder="+55 (11) 9 9999-9999"
+                  value={cellphoneMask(field.value)}
+                  loading={isLoading}
+                  error={errors.company_cellphone?.message}
+                />
+              )}
+            />
+
+            <Controller
+              name="company_phone"
+              control={control}
+              render={({ field }) => (
+                <ControlledInput
+                  {...field}
+                  type="text"
+                  label="Phone"
+                  placeholder="11 3333-3333"
+                  loading={isLoading}
+                  error={errors.company_phone?.message}
                 />
               )}
             />
@@ -137,30 +208,19 @@ const UpdateCompanyProfileForm: React.FC = () => {
                   type="text"
                   label="Site"
                   placeholder="https://odontoapp.com.br"
-                />
-              )}
-            />
-
-            <Controller
-              name="company_type"
-              control={control}
-              render={({ field }) => (
-                <ControlledSelect
-                  {...field}
-                  label="Company type"
-                  defaultLabel="Select company type"
-                  options={[
-                    { value: 0, text: "Dental clinic" },
-                    { value: 1, text: "Dental lab" },
-                  ]}
+                  loading={isLoading}
+                  error={errors.company_website?.message}
                 />
               )}
             />
           </div>
           <div id="actions-container" className="w-full">
-            <button className="bg-blue-500 py-4 w-full rounded-xl font-medium text-white hover:bg-blue-700 transition-colors">
-              Update company profile
-            </button>
+            <Button
+              type="submit"
+              label="Update Company Profile"
+              disabled={!isDirty}
+              loading={isLoading}
+            />
           </div>
         </form>
       </div>

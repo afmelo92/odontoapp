@@ -1,37 +1,101 @@
 import ControlledInput from "@/app/_components/ControlledInput";
+import { updateUserMutation } from "@/services/mutations";
+import { cpfMask } from "@/utils";
+import APIError from "@/utils/APIError";
+import { updateUserProfileSchema } from "@/utils/schemas";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useMutation } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
-import React from "react";
+import { subYears } from "date-fns";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { UpdateResponse } from "@/pages/api/auth/[...nextauth]";
+import Button from "@/app/_components/Button";
 
-type UpdateUserProfileInputs = {
+export type UpdateUserProfileInputs = {
   user_name: string;
   user_cpf: string;
-  user_birth_date: string;
+  user_cro: string;
+  user_birth: string;
   user_address: string;
   user_company: string;
   user_post: string;
   user_email: string;
+  user_confirm_email: string;
   user_password: string;
   user_confirm_password: string;
 };
 
 const UpdateUserProfileForm: React.FC = () => {
-  const { control, handleSubmit } = useForm<UpdateUserProfileInputs>({
+  const session = useSession();
+
+  const userData = session.data?.user || null;
+
+  const {
+    control,
+    handleSubmit,
+    setError,
+    formState: { errors, isDirty, dirtyFields },
+    resetField,
+  } = useForm<UpdateUserProfileInputs>({
     defaultValues: {
-      user_address: "",
-      user_birth_date: "",
-      user_company: "",
-      user_confirm_password: "",
-      user_cpf: "",
-      user_email: "",
-      user_name: "",
+      user_address: userData?.address || "",
+      user_birth: userData?.birth?.split("T")[0] || "",
+      user_company: userData?.company?.name || `${userData?.name}'s clinic`,
+      user_cpf: userData?.cpf || "",
+      user_email: userData?.email || "",
+      user_confirm_email: userData?.email || "",
+      user_name: userData?.name || "",
+      user_post: userData?.post || "",
       user_password: "",
-      user_post: "",
+      user_confirm_password: "",
+      user_cro: userData?.cro || "",
+    },
+    resolver: yupResolver(updateUserProfileSchema),
+  });
+
+  const { mutateAsync, isLoading } = useMutation<
+    UpdateResponse,
+    APIError,
+    UpdateUserProfileInputs
+  >({
+    mutationFn: (data) => {
+      return updateUserMutation({
+        ...data,
+        user_id: userData?.id || "",
+        user_token: userData?.accessToken || "",
+      });
+    },
+    onSuccess: async (data) => {
+      // SHOW TOAST
+      const userResponseData = data.data;
+
+      await session.update({ ...userResponseData });
+
+      resetField("user_password");
+      resetField("user_confirm_password");
+      resetField("user_confirm_email");
+    },
+    onError: (error) => {
+      // SHOW TOAST
+      console.log({ error });
+      error.setFormAPIErrors(error, setError);
     },
   });
 
-  const onSubmit: SubmitHandler<UpdateUserProfileInputs> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<UpdateUserProfileInputs> = async (data) => {
+    let formattedUserBirth: Date | string = "";
+
+    if (data.user_birth) {
+      formattedUserBirth = new Date(data.user_birth).toISOString();
+    }
+
+    const formattedInput: UpdateUserProfileInputs = {
+      ...data,
+      user_birth: formattedUserBirth,
+    };
+
+    await mutateAsync(formattedInput);
   };
 
   return (
@@ -60,6 +124,23 @@ const UpdateUserProfileForm: React.FC = () => {
                   type="text"
                   label="Name"
                   placeholder="John Doe"
+                  loading={isLoading}
+                  error={errors.user_name?.message}
+                />
+              )}
+            />
+
+            <Controller
+              name="user_birth"
+              control={control}
+              render={({ field }) => (
+                <ControlledInput
+                  {...field}
+                  type="date"
+                  label="Birth date"
+                  loading={isLoading}
+                  max={subYears(new Date(), 18).toISOString().split("T")[0]}
+                  error={errors.user_birth?.message}
                 />
               )}
             />
@@ -70,18 +151,13 @@ const UpdateUserProfileForm: React.FC = () => {
               render={({ field }) => (
                 <ControlledInput
                   {...field}
-                  type="number"
+                  type="text"
                   label="CPF"
                   placeholder="123.456.789-55"
+                  value={cpfMask(field.value)}
+                  disabled
+                  error={errors.user_cpf?.message}
                 />
-              )}
-            />
-
-            <Controller
-              name="user_birth_date"
-              control={control}
-              render={({ field }) => (
-                <ControlledInput {...field} type="date" label="Birth date" />
               )}
             />
 
@@ -94,6 +170,8 @@ const UpdateUserProfileForm: React.FC = () => {
                   type="text"
                   label="Address"
                   placeholder="Av Marcelino Pires, 890"
+                  loading={isLoading}
+                  error={errors.user_address?.message}
                 />
               )}
             />
@@ -107,6 +185,26 @@ const UpdateUserProfileForm: React.FC = () => {
                   type="text"
                   label="Company"
                   placeholder="Odontoapp Odontologia"
+                  disabled={true}
+                  title="Change this field in company tab"
+                  loading={isLoading}
+                  error={errors.user_company?.message}
+                />
+              )}
+            />
+
+            <Controller
+              name="user_cro"
+              control={control}
+              render={({ field }) => (
+                <ControlledInput
+                  {...field}
+                  type="text"
+                  label="CRO"
+                  placeholder="12345-SP"
+                  title={field.value}
+                  loading={isLoading}
+                  error={errors.user_cro?.message}
                 />
               )}
             />
@@ -121,8 +219,19 @@ const UpdateUserProfileForm: React.FC = () => {
                   label="Post"
                   placeholder="Doctor, recepcionist, janitor..."
                   autoComplete="off"
+                  loading={isLoading}
+                  title={field.value}
+                  error={errors.user_post?.message}
                 />
               )}
+            />
+
+            <ControlledInput
+              name="invisible"
+              type="text"
+              autoComplete="off"
+              invisible={true}
+              readOnly={true}
             />
 
             <Controller
@@ -134,6 +243,8 @@ const UpdateUserProfileForm: React.FC = () => {
                   type="email"
                   label="E-mail"
                   placeholder="john.doe@email.com"
+                  loading={isLoading}
+                  error={errors.user_email?.message}
                 />
               )}
             />
@@ -147,6 +258,25 @@ const UpdateUserProfileForm: React.FC = () => {
                   type="password"
                   label="Password"
                   placeholder="Your secret password"
+                  autoComplete="new-password"
+                  loading={isLoading}
+                  error={errors.user_password?.message}
+                />
+              )}
+            />
+
+            <Controller
+              name="user_confirm_email"
+              control={control}
+              render={({ field }) => (
+                <ControlledInput
+                  {...field}
+                  type="text"
+                  label="Confirm E-mail"
+                  placeholder="Confirm your new e-mail"
+                  loading={isLoading}
+                  error={errors.user_confirm_email?.message}
+                  invisible={!dirtyFields.user_email}
                 />
               )}
             />
@@ -160,14 +290,21 @@ const UpdateUserProfileForm: React.FC = () => {
                   type="password"
                   label="Confirm password"
                   placeholder="Your secret password confirmation"
+                  loading={isLoading}
+                  error={errors.user_confirm_password?.message}
+                  invisible={!dirtyFields.user_password}
                 />
               )}
             />
           </div>
+
           <div id="actions-container" className="w-full">
-            <button className="bg-blue-500 py-4 w-full rounded-xl font-medium text-white hover:bg-blue-700 transition-colors">
-              Update Profile
-            </button>
+            <Button
+              type="submit"
+              label="Update Profile"
+              disabled={!isDirty}
+              loading={isLoading}
+            />
           </div>
         </form>
       </div>

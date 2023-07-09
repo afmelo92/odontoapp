@@ -45,7 +45,7 @@ const CustomersPage: React.FC = () => {
         >
           {getIcon({
             name: "plus-circle",
-            className: `w-6 h-w-6 stroke-blue-500 group-hover:stroke-blue-700`,
+            className: `w-6 h-6 stroke-blue-500 group-hover:stroke-blue-700`,
             strokeWidth: 2,
           })}
           <p className="group-hover:text-blue-700">Add new customer</p>
