@@ -25,12 +25,35 @@ model Users {
   cro String?
   cellphone String?
   phone String?
-  company String?
-  cpf_cnpj String
+  cpf String? @unique
   address String?
   password String
+  birth DateTime? @db.Date
+  post String?
   active Boolean? @default(true)
   role      Role     @default(DENTIST)
+  company Companies? @relation("owner")
+  employee Companies? @relation(fields: [employee_id], references: [id])
+  employee_id Int? @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Companies {
+  id  Int @id @default(autoincrement())
+  uid String @unique @default(uuid())
+  primary_email String? @unique
+  secondary_email String? @unique
+  name String?
+  cnpj String? @unique
+  cellphone String?
+  phone String?
+  owner  Users  @relation("owner", fields: [owner_id], references: [id])
+  owner_id Int @unique
+  employees Users[]
+  address String?
+  website String?
+  active Boolean? @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
