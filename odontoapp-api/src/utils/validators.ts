@@ -6,11 +6,11 @@ const validateCNPJ = (cnpj: string) => {
 };
 
 const validateCPF = (cpf: string) => {
-  return /^\d{3}\.\d{3}\.\d{3}\-\d{2}$/.test(cpf);
+  return /^\d{3}[\.]?\d{3}[\.]?\d{3}[\-]?\d{2}$/.test(cpf);
 };
 
 const validateCPFCNPJ = (cpfOrCnpj: string) => {
-  return /(^\d{3}\.\d{3}\.\d{3}\-\d{2}$)|(^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$)/.test(
+  return /(^\d{3}[\.]?\d{3}[\.]?\d{3}[\-]?\d{2}$)|(^\d{2}[\.]?\d{3}[\.]?\d{3}[\/]?\d{4}[\-]?\d{2}$)/.test(
     cpfOrCnpj
   );
 };

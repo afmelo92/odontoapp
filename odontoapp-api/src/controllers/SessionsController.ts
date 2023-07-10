@@ -3,9 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import config from '@/etc/config';
 import { validateEmail } from '@/utils/validators';
-import UsersRepository, {
-  safeUserSelectSet,
-} from '@/repositories/UsersRepository';
+import UsersRepository from '@/repositories/UsersRepository';
 
 class SessionsController {
   async create(req: Request, res: Response) {
@@ -26,9 +24,29 @@ class SessionsController {
     const user = await UsersRepository.findByEmail({
       email,
       select: {
-        ...safeUserSelectSet,
+        address: true,
+        birth: true,
+        cellphone: true,
+        cpf: true,
+        cro: true,
+        email: true,
+        uid: true,
+        post: true,
+        name: true,
+        phone: true,
         password: true,
-        role: true,
+        company: {
+          select: {
+            address: true,
+            primary_email: true,
+            secondary_email: true,
+            cellphone: true,
+            cnpj: true,
+            name: true,
+            phone: true,
+            website: true,
+          },
+        },
       },
     });
 
@@ -59,12 +77,14 @@ class SessionsController {
       email: user.email,
       name: user.name,
       cro: user.cro,
-      cpf_cnpj: user.cpf_cnpj,
+      cpf: user.cpf,
       cellphone: user.cellphone,
       phone: user.phone,
       company: user.company,
       address: user.address,
       role: user.role,
+      birth: user.birth,
+      post: user.post,
     };
 
     return res.json({

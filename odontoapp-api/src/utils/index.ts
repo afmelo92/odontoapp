@@ -11,4 +11,12 @@ function setAccountType(type: number) {
   }
 }
 
-export { setAccountType };
+function mapBodyErrorFields(body: Record<string, any>) {
+  return [
+    ...Object.entries(body)
+      .map(([key, value]) => (Boolean(value) === false ? key : null))
+      .filter(Boolean),
+  ];
+}
+
+export { setAccountType, mapBodyErrorFields };
