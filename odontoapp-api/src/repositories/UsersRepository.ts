@@ -1,4 +1,4 @@
-import { Companies, Prisma, Users } from '@prisma/client';
+import { Companies, Patients, Prisma, Users } from '@prisma/client';
 import prisma from '@/db';
 
 type FindALlProps = {
@@ -34,6 +34,35 @@ type UpdateUserProps = {
   userData: Partial<Users>;
   companyData: Partial<Companies>;
   select?: Prisma.UsersSelect;
+};
+
+type CreateOrConnectPatientProps = {
+  dentistUid: string;
+  patientData: Omit<
+    Patients,
+    'id' | 'uid' | 'role' | 'createdAt' | 'updatedAt'
+  >;
+};
+
+type FindPatientsByUIDProps = {
+  dentistId: string;
+};
+
+type DisconnectPatientProps = {
+  userId: string;
+  patientId: string;
+};
+
+export const safePatientSelectSet: Prisma.PatientsSelect = {
+  name: true,
+  email: true,
+  address: true,
+  birth: true,
+  cellphone: true,
+  cpf: true,
+  sex: true,
+  zip_code: true,
+  uid: true,
 };
 
 export const safeUserSelectSet: Prisma.UsersSelect = {
@@ -174,6 +203,96 @@ class UsersRepository {
         },
       },
       select,
+    });
+
+    return user;
+  }
+
+  public async createOrConnectPatient({
+    dentistUid,
+    patientData,
+  }: CreateOrConnectPatientProps) {
+    const patient = await prisma.users.update({
+      where: {
+        uid: dentistUid,
+      },
+      data: {
+        patients: {
+          connectOrCreate: {
+            create: {
+              ...patientData,
+              role: 'PATIENT',
+            },
+            where: {
+              cpf: patientData.cpf,
+            },
+          },
+        },
+      },
+      select: {
+        patients: {
+          where: {
+            cpf: patientData.cpf,
+          },
+          select: {
+            ...safePatientSelectSet,
+          },
+        },
+      },
+    });
+
+    return patient.patients.length > 0 ? patient.patients[0] : [];
+  }
+
+  public async findPatientsByUID({ dentistId }: FindPatientsByUIDProps) {
+    const patients = await prisma.users.findUnique({
+      where: {
+        uid: dentistId,
+      },
+      select: {
+        uid: true,
+        name: true,
+        patients: {
+          select: {
+            ...safePatientSelectSet,
+          },
+        },
+      },
+    });
+
+    return patients;
+  }
+
+  public async findAllPatients() {
+    const patients = await prisma.users.findMany({
+      select: {
+        uid: true,
+        patients: {
+          select: {
+            ...safePatientSelectSet,
+          },
+        },
+      },
+    });
+
+    return patients;
+  }
+
+  public async disconnectPatient({
+    userId,
+    patientId,
+  }: DisconnectPatientProps) {
+    const user = await prisma.users.update({
+      where: {
+        uid: userId,
+      },
+      data: {
+        patients: {
+          disconnect: {
+            uid: patientId,
+          },
+        },
+      },
     });
 
     return user;

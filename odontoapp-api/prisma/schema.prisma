@@ -18,42 +18,60 @@ enum Role {
 }
 
 model Users {
-  id  Int @id @default(autoincrement())
-  uid String @unique @default(uuid())
-  email String @unique
-  name String
-  cro String?
-  cellphone String?
-  phone String?
-  cpf String? @unique
-  address String?
-  password String
-  birth DateTime? @db.Date
-  post String?
-  active Boolean? @default(true)
-  role      Role     @default(DENTIST)
-  company Companies? @relation("owner")
-  employee Companies? @relation(fields: [employee_id], references: [id])
-  employee_id Int? @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int         @id     @default(autoincrement())
+  uid           String      @unique @default(uuid())
+  email         String      @unique
+  name          String
+  cro           String?
+  cellphone     String?
+  phone         String?
+  cpf           String?     @unique
+  address       String?
+  password      String
+  birth         DateTime?   @db.Date
+  post          String?
+  active        Boolean?    @default(true)
+  role          Role        @default(DENTIST)
+  company       Companies?  @relation("owner")
+  employee      Companies?  @relation(fields: [employee_uid], references: [uid])
+  employee_uid  String?     @unique
+  patients      Patients[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 model Companies {
-  id  Int @id @default(autoincrement())
-  uid String @unique @default(uuid())
-  primary_email String? @unique
-  secondary_email String? @unique
-  name String?
-  cnpj String? @unique
+  id              Int       @id     @default(autoincrement())
+  uid             String    @unique @default(uuid())
+  primary_email   String?   @unique
+  secondary_email String?   @unique
+  name            String?
+  cnpj            String?   @unique
+  cellphone       String?
+  phone           String?
+  owner           Users     @relation("owner", fields: [owner_id], references: [id], onDelete: Cascade)
+  owner_id        Int       @unique
+  employees       Users[]
+  address         String?
+  website         String?
+  active          Boolean?  @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Patients {
+  id        Int       @id     @default(autoincrement())
+  uid       String    @unique @default(uuid())
+  email     String?   @unique
+  name      String
   cellphone String?
-  phone String?
-  owner  Users  @relation("owner", fields: [owner_id], references: [id], onDelete: Cascade)
-  owner_id Int @unique
-  employees Users[]
-  address String?
-  website String?
-  active Boolean? @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  cpf       String    @unique
+  address   String?
+  zip_code  String?
+  birth     DateTime? @db.Date
+  sex       Boolean?
+  dentists  Users[]
+  role      Role      @default(PATIENT)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }

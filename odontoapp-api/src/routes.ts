@@ -4,6 +4,7 @@ import SessionsController from './controllers/SessionsController';
 import isAuthenticated from './middlewares/isAuthenticated';
 import isAdmin from './middlewares/isAdmin';
 import personalAction from './middlewares/personalAction';
+import PatientsController from './controllers/PatientsController';
 
 const router = Router();
 
@@ -31,6 +32,22 @@ router.put(
 router.get('/users/:id', isAuthenticated, personalAction, UsersController.show);
 router.delete('/users/:id', isAuthenticated, isAdmin, UsersController.delete);
 
+// PATIENTS
+router.post('/patients', isAuthenticated, PatientsController.create);
+router.get(
+  '/patients/:id',
+  isAuthenticated,
+  personalAction,
+  PatientsController.show
+);
+router.get('/patients/', isAuthenticated, isAdmin, PatientsController.index);
+router.delete(
+  '/patients/:patient_id',
+  isAuthenticated,
+  personalAction,
+  PatientsController.delete
+);
+
 export default router;
 
 // Extracted from express-serve-static-core
@@ -50,7 +67,6 @@ export interface TypedRequestQuery<T extends Query> extends Express.Request {
 }
 
 // type for Request query and body
-
 export interface TypedRequest<T extends Query, U> extends Express.Request {
   body: U;
   query: T;
