@@ -1,28 +1,32 @@
 "use client";
-
 import { usePatients } from "../_hooks/usePatients";
-import Pagination from "@/app/_components/Pagination";
 import TableRow from "./TableRow";
 import TableHeader from "./TableHeader";
+import Pagination from "./Pagination";
 
 type TableProps = {
   // onScheduleAppointment: React.Dispatch<React.SetStateAction<boolean>>;
   // eslint-disable-next-line no-unused-vars
   onScheduleAppointment: (x: boolean) => void;
+  // eslint-disable-next-line no-unused-vars
+  onEmptyList: (status: boolean) => void;
 };
 
-const Table: React.FC<TableProps> = ({ onScheduleAppointment }) => {
-  const { state, dispatch } = usePatients();
+const Table: React.FC<TableProps> = ({
+  onScheduleAppointment,
+  onEmptyList,
+}) => {
+  const { filtered } = usePatients();
 
   return (
     <>
       <table className="h-full max-h-full w-full">
         <TableHeader />
         <tbody className="grid grid-rows-6 grid-cols-1 h-full">
-          {state.filtered.length > 0 ? (
-            state.filtered.map((patient) => (
+          {filtered.length > 0 ? (
+            filtered.map((patient) => (
               <TableRow
-                key={patient.id}
+                key={patient.uid}
                 patient={patient}
                 onScheduleAppointment={onScheduleAppointment}
               />
@@ -33,7 +37,10 @@ const Table: React.FC<TableProps> = ({ onScheduleAppointment }) => {
                 <h1 className="font-medium text-2xl text-gray-900">
                   Oops! It looks like there is no patient registered yet.
                 </h1>
-                <button className="bg-blue-500 p-6 rounded-lg text-white font-medium hover:bg-blue-700 transition-colors">
+                <button
+                  onClick={() => onEmptyList(true)}
+                  className="bg-blue-500 p-6 rounded-lg text-white font-medium hover:bg-blue-700 transition-colors"
+                >
                   Create patient now
                 </button>
               </td>
@@ -41,7 +48,7 @@ const Table: React.FC<TableProps> = ({ onScheduleAppointment }) => {
           )}
         </tbody>
       </table>
-      <Pagination state={state.pagination} dispatch={dispatch} />
+      <Pagination />
     </>
   );
 };

@@ -1,12 +1,12 @@
-import { ActionProps } from "../../(dashboard)/appointments/_contexts/AppointmentsContext";
+import { Dispatch, SetStateAction } from "react";
 import { getIcon } from "@/utils/getIcon";
 
 type InputProps = {
   searchData: string;
-  dispatch: React.Dispatch<ActionProps>;
+  setValue: Dispatch<SetStateAction<string>>;
 };
 
-const SearchInput: React.FC<InputProps> = ({ searchData, dispatch }) => {
+const SearchInput: React.FC<InputProps> = ({ searchData, setValue }) => {
   return (
     <div className="py-3 px-6 bg-gray-100 rounded-full flex items-center gap-4 text-sm">
       <input
@@ -14,14 +14,7 @@ const SearchInput: React.FC<InputProps> = ({ searchData, dispatch }) => {
         type="text"
         placeholder="Search..."
         className="bg-gray-100 focus:outline-none placeholder:text-gray-400 caret-gray-400"
-        onChange={(e) =>
-          dispatch({
-            type: "FILTER_DATA",
-            payload: {
-              data: e.target.value,
-            },
-          })
-        }
+        onChange={(e) => setValue(e.target.value)}
       />
       {getIcon({
         name: "magnifier",

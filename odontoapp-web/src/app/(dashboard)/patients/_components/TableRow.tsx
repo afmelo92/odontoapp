@@ -1,6 +1,11 @@
 import { Patient } from "../_contexts/PatientsContext";
 import { getIcon } from "@/utils/getIcon";
 import { usePatients } from "../_hooks/usePatients";
+import { useMutation } from "@tanstack/react-query";
+import APIError from "@/utils/APIError";
+import { APIResponse } from "@/pages/api/auth/[...nextauth]";
+import { useSession } from "next-auth/react";
+import { deletePatientsMutation } from "@/services/mutations";
 
 type TableRowProps = {
   patient?: Patient;
@@ -10,15 +15,51 @@ type TableRowProps = {
   onScheduleAppointment: (x: boolean) => void;
 };
 
+type DeletePatientInputs = {
+  patientUID: string;
+};
+
 const TableRow: React.FC<TableRowProps> = ({
   patient,
   onScheduleAppointment,
 }) => {
-  const { dispatch } = usePatients();
+  const session = useSession();
+
+  const userData = session.data?.user || null;
+
+  const { dispatch, queryReturn } = usePatients();
+
+  const { isLoading, mutateAsync } = useMutation<
+    APIResponse,
+    APIError,
+    DeletePatientInputs
+  >({
+    mutationFn: (data) => {
+      return deletePatientsMutation({
+        patient_id: data.patientUID,
+        user_token: userData?.accessToken || "",
+      });
+    },
+    onSuccess: () => {
+      // show toast
+      queryReturn?.refetch();
+    },
+    onError: (error) => {
+      // show toast
+      console.log(error);
+    },
+  });
+
+  async function handleDeletePatient(patientUID: string) {
+    // implement modal to confirm
+    if (patientUID) {
+      await mutateAsync({ patientUID });
+    }
+  }
 
   return (
     <tr
-      key={patient?.id}
+      key={patient?.uid}
       className="grid grid-cols-4 h-full text-gray-700 text-base border-b-2 border-b-gray-100 px-6 py-4 items-center"
     >
       <td
@@ -50,13 +91,13 @@ const TableRow: React.FC<TableRowProps> = ({
         {patient?.doctor}
       </td>
       <td>
-        {patient && patient?.next_appointments.length > 0 ? (
+        {patient && patient?.next_appointments?.length > 0 ? (
           <p className="font-medium text-sm flex items-baseline gap-2">
             {new Intl.DateTimeFormat("pt-BR", {
               day: "2-digit",
               month: "short",
               year: "numeric",
-            }).format(new Date(patient.next_appointments[0]))}
+            }).format(new Date(patient?.next_appointments[0]))}
 
             <span title="Edit apppointment date">
               {getIcon({
@@ -69,12 +110,18 @@ const TableRow: React.FC<TableRowProps> = ({
           </p>
         ) : (
           <button
-            className="group focus:outline-green-500 bg-green-100 p-4 rounded-xl hover:bg-green-200 transition-colors font-semibold text-xs text-green-500 hover:text-green-700 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+            className="before:content-['Comming_soon'] before:bg-red-500 before:text-white 
+              before:p-2 before:rounded-xl before:text-xs before:absolute before:-right-5 
+              before:-top-5 before:font-medium
+              relative group focus:outline-green-500 bg-green-100 p-4 rounded-xl 
+              hover:bg-green-200 transition-colors font-semibold text-xs text-green-500 
+              hover:text-green-700 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
             title="Schedule appointment"
+            disabled
             onClick={() => {
               dispatch({
                 type: "SELECT_PATIENT",
-                payload: { data: patient?.id },
+                payload: { data: patient?.uid },
               });
               onScheduleAppointment(true);
             }}
@@ -86,35 +133,60 @@ const TableRow: React.FC<TableRowProps> = ({
       <td className="flex items-center justify-end">
         <div className="flex gap-2">
           <button
-            className="group focus:outline-green-500 bg-green-100 p-4 rounded-xl hover:bg-green-200 transition-colors"
+            className="group 
+            focus:outline-green-500 
+            bg-green-100 p-4 rounded-xl 
+            hover:bg-green-200 transition-colors
+            stroke-green-600
+            disabled:cursor-not-allowed 
+            disabled:bg-gray-300 
+            disabled:stroke-gray-500"
+            disabled
             title="Visualize patient info"
           >
             {getIcon({
               name: "document-text",
               className:
-                "w-5 h-5 stroke-green-500 group-hover:stroke-green-600 transition-colors",
+                "w-5 h-5 stroke-inherit group-hover:inherit transition-colors",
               strokeWidth: 2,
             })}
           </button>
           <button
-            className="group focus:outline-blue-500 bg-blue-100 p-4 rounded-xl hover:bg-blue-200 transition-colors"
+            className="group 
+            focus:outline-blue-500 
+            bg-blue-100 p-4 rounded-xl 
+            hover:bg-blue-200 transition-colors
+            stroke-blue-600
+              disabled:cursor-not-allowed 
+            disabled:bg-gray-300 
+            disabled:stroke-gray-500 "
+            disabled
             title="Talk to patient"
           >
             {getIcon({
               name: "chat-bubble-left-ellipsis",
               className:
-                "w-5 h-5 stroke-blue-500 group-hover:stroke-blue-600 transition-colors",
+                "w-5 h-5 stroke-inherit group-hover:inherit transition-colors",
               strokeWidth: 2,
             })}
           </button>
           <button
-            className="group focus:outline-red-500 bg-red-100 p-4 rounded-xl hover:bg-red-200 transition-colors"
+            className="group 
+            focus:outline-red-500 
+            bg-red-100 p-4 rounded-xl 
+            hover:bg-red-200 transition-colors
+            stroke-red-600
+            disabled:cursor-not-allowed 
+            disabled:bg-gray-300 
+            disabled:stroke-gray-500 "
             title="Delete patient"
+            disabled={isLoading}
+            onClick={() => handleDeletePatient(patient?.uid || "")}
           >
             {getIcon({
               name: "trash",
               className:
-                "w-5 h-5 stroke-red-500 group-hover:stroke-red-600 transition-colors",
+                "w-5 h-5 stroke-inherit group-hover:inherit transition-colors",
               strokeWidth: 2,
             })}
           </button>

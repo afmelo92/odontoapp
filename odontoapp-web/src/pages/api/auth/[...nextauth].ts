@@ -1,5 +1,12 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+
+export interface APIResponse extends Response {
+  data: {
+    message: string;
+    data?: unknown;
+  };
+}
 export interface UpdateResponse extends Response {
   data: SessionUpdateData;
 }

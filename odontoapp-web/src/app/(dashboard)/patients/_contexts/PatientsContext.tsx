@@ -1,11 +1,30 @@
 "use client";
-
-import { createContext, useReducer } from "react";
+import { getUserPatients } from "@/services/queries";
+import { UseQueryResult, useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+import {
+  Dispatch,
+  SetStateAction,
+  createContext,
+  useCallback,
+  useReducer,
+  useState,
+} from "react";
+import { differenceInYears } from "date-fns";
+import usePagination, {
+  Pagination,
+  initialPaginationState,
+} from "@/app/_hooks/usePagination";
 
 export type Patient = {
-  id: number;
+  uid: string;
   name: string;
-  doctor: string;
+  email: string;
+  birth: string;
+  cellphone: string;
+  cpf: string;
+  zip_code: string;
+  doctor?: string;
   age: number;
   sex: "M" | "F";
   next_appointments: string[];
@@ -28,9 +47,9 @@ export type StateProps = {
   };
 };
 
-export const patientsMock: Patient[] = [
+export const patientsMock = [
   {
-    id: 1,
+    uid: 1,
     name: "Augustus",
     age: 61,
     sex: "M",
@@ -40,7 +59,7 @@ export const patientsMock: Patient[] = [
     complete_bio: true,
   },
   {
-    id: 2,
+    uid: 2,
     name: "Tiberius",
     age: 64,
     sex: "M",
@@ -50,7 +69,7 @@ export const patientsMock: Patient[] = [
     complete_bio: false,
   },
   {
-    id: 3,
+    uid: 3,
     name: "Publius Helvius Pertinax",
     age: 62,
     sex: "M",
@@ -60,7 +79,7 @@ export const patientsMock: Patient[] = [
     complete_bio: true,
   },
   {
-    id: 4,
+    uid: 4,
     name: "Lucius Verus",
     age: 44,
     sex: "M",
@@ -70,7 +89,7 @@ export const patientsMock: Patient[] = [
     complete_bio: true,
   },
   {
-    id: 5,
+    uid: 5,
     name: "Septimius Severus",
     age: 50,
     sex: "M",
@@ -80,7 +99,7 @@ export const patientsMock: Patient[] = [
     complete_bio: false,
   },
   {
-    id: 6,
+    uid: 6,
     name: "Marcus Aurelius",
     age: 33,
     sex: "M",
@@ -90,7 +109,7 @@ export const patientsMock: Patient[] = [
     complete_bio: true,
   },
   {
-    id: 7,
+    uid: 7,
     name: "Julius Caesar",
     age: 30,
     sex: "M",
@@ -100,7 +119,7 @@ export const patientsMock: Patient[] = [
     complete_bio: false,
   },
   {
-    id: 8,
+    uid: 8,
     name: "Galerius Valerius Maximinus",
     age: 30,
     sex: "M",
@@ -118,7 +137,7 @@ export type ActionProps = {
 
 const initialState = {
   searchData: "",
-  patients: patientsMock,
+  patients: [],
   filtered: [],
   selected: null,
   pagination: {
@@ -184,7 +203,7 @@ function reducer(state: StateProps, action: ActionProps) {
           ? state.patients.filter(
               (patient) =>
                 patient.name.toLowerCase().includes(data.toLowerCase()) ||
-                patient.doctor.toLowerCase().includes(data.toLowerCase()) ||
+                // patient.doctor.toLowerCase().includes(data.toLowerCase()) ||
                 patient.sex.toLowerCase().includes(data.toLowerCase())
             )
           : state.patients;
@@ -215,7 +234,7 @@ function reducer(state: StateProps, action: ActionProps) {
       return {
         ...state,
         selected:
-          state.patients.filter((patient) => patient.id === data)[0] || null,
+          state.patients.filter((patient) => patient.uid === data)[0] || null,
         pagination: {
           ...state.pagination,
         },
@@ -230,6 +249,26 @@ function reducer(state: StateProps, action: ActionProps) {
 type ContextProps = {
   state: StateProps;
   dispatch: React.Dispatch<ActionProps>;
+  patients: Patient[];
+  queryReturn: UseQueryResult<any, unknown> | null;
+  filtered: Patient[];
+  searchValue: string;
+  setSearchValue: Dispatch<SetStateAction<string>>;
+  setNextPage: () => void;
+  setPrevPage: () => void;
+  pagination: Pagination;
+  hasNext: boolean;
+  hasPrev: boolean;
+  totalPages: number;
+};
+
+type QueryResponse = {
+  message: string;
+  data: {
+    uid: string;
+    name: string;
+    patients: Patient[];
+  };
 };
 
 type ProviderProps = {
@@ -239,9 +278,78 @@ type ProviderProps = {
 const PatientsContext = createContext<ContextProps>({
   state: initialState,
   dispatch: () => null,
+  queryReturn: null,
+  patients: [],
+  filtered: [],
+  searchValue: "",
+  setSearchValue: (prev) => prev,
+  setNextPage: () => null,
+  setPrevPage: () => null,
+  pagination: {
+    ...initialPaginationState,
+  },
+  hasNext: true,
+  hasPrev: false,
+  totalPages: 1,
 });
 
 const PatientsContextProvider = ({ children }: ProviderProps) => {
+  const session = useSession();
+
+  const userData = session.data?.user || null;
+
+  const [searchValue, setSearchValue] = useState("");
+
+  const queryReturn = useQuery<QueryResponse, Error>({
+    queryKey: ["get-patients", userData?.id, userData?.accessToken],
+    queryFn: async () => {
+      return getUserPatients({
+        user_id: userData?.id || "",
+        user_token: userData?.accessToken || "",
+      });
+    },
+    select: (data) => {
+      return {
+        ...data,
+        data: {
+          ...data.data,
+          patients: data?.data.patients.map((patient) => ({
+            ...patient,
+            sex: patient.sex ? "M" : "F",
+            birth: new Date(patient.birth).toISOString(),
+            age: differenceInYears(new Date(), new Date(patient.birth)),
+            doctor: data.data.name,
+          })),
+        },
+      };
+    },
+  });
+
+  const filterFn = useCallback(
+    (patient: Patient) =>
+      patient.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+      patient.email.toLowerCase().includes(searchValue.toLowerCase()) ||
+      patient.doctor?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      patient.sex.toLowerCase().includes(searchValue.toLowerCase()),
+    [searchValue]
+  );
+
+  const patients = queryReturn.data?.data.patients || [];
+
+  const {
+    slicedData,
+    setNextPage,
+    setPrevPage,
+    pagination,
+    hasNext,
+    hasPrev,
+    totalPages,
+  } = usePagination({
+    data: patients,
+    filterFn,
+  });
+
+  // reducer logic
   const [state, dispatch] = useReducer(reducer, initialState, (init) => {
     const firstSlice = init.patients.slice(
       init.pagination.index,
@@ -254,13 +362,29 @@ const PatientsContextProvider = ({ children }: ProviderProps) => {
       pagination: {
         ...init.pagination,
         totalPages: Math.ceil(init.patients.length / init.pagination.perPage),
-        next: firstSlice.length <= init.pagination.perPage,
+        next: firstSlice.length < init.pagination.perPage,
       },
     };
   });
 
   return (
-    <PatientsContext.Provider value={{ state, dispatch }}>
+    <PatientsContext.Provider
+      value={{
+        state,
+        dispatch,
+        patients: patients,
+        queryReturn,
+        filtered: slicedData,
+        searchValue,
+        setSearchValue,
+        setNextPage,
+        setPrevPage,
+        pagination,
+        hasNext,
+        hasPrev,
+        totalPages,
+      }}
+    >
       {children}
     </PatientsContext.Provider>
   );

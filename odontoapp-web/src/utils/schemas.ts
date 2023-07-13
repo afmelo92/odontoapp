@@ -80,9 +80,35 @@ const updateCompanyProfileSchema = yup.object({
       /^(?:(?:\+|00)?(55)\s?)?(?:\(?([1-9][0-9])\)?\s?)(?:((?:9\s?\d|[2-9])\d{3})\-?(\d{4}))$/,
       "Allowed 55 11 9 9123-1234"
     ),
-
   company_phone: yup.string(),
   company_website: yup.string(),
+});
+
+const createPatientsSchema = yup.object({
+  patient_name: yup.string().required(),
+  patient_cellphone: yup
+    .string()
+    .matches(
+      /^(?:\(?([1-9][0-9])\)?\s?)(?:((?:9\s?\d|[2-9])\d{3})\-?(\d{4}))$/,
+      "Allowed 11 9 9123-1234"
+    )
+    .required(),
+  patient_phone: yup.string(),
+  patient_address: yup.string().required(),
+  patient_email: yup.string().email().required(),
+  patient_cpf: yup
+    .string()
+    .matches(
+      /(^\d{3}[\.]?\d{3}[\.]?\d{3}[\-]?\d{2}$)|(^\d{2}[\.]?\d{3}[\.]?\d{3}[\/]?\d{4}[\-]?\d{2}$)/,
+      "Allowed 123.456.789-55"
+    )
+    .required(),
+  patient_birth: yup.string().required(),
+  patient_zip: yup
+    .string()
+    .matches(/[0-9]{5}-?[\d]{3}/, "Allowed 12345-678")
+    .required(),
+  patient_sex: yup.string().oneOf(["M", "F", ""]).required(),
 });
 
 export {
@@ -90,4 +116,5 @@ export {
   signInSchema,
   updateUserProfileSchema,
   updateCompanyProfileSchema,
+  createPatientsSchema,
 };

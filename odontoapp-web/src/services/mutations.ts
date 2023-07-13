@@ -2,6 +2,7 @@ import { SignUpInputs } from "@/app/(auth)/signup/_components/SignUpForm";
 import HttpClient from "./HttpClient";
 import { UpdateUserProfileInputs } from "@/app/(dashboard)/profile/_components/Forms/UpdateUserProfile";
 import { UpdateCompanyProfileInputs } from "@/app/(dashboard)/profile/_components/Forms/UpdateCompanyProfile";
+import { CreatePatientInputs } from "@/app/(dashboard)/patients/page";
 
 const httpClient = new HttpClient("http://localhost:3333");
 
@@ -26,6 +27,11 @@ const signUpMutation = async ({
       }),
     },
   });
+};
+
+type AuthRequest = {
+  user_id: string;
+  user_token: string;
 };
 
 type CompleteUpdatProps = {
@@ -86,4 +92,63 @@ const updateUserMutation = async ({
   });
 };
 
-export { signUpMutation, updateUserMutation };
+type CreatePatientsMutationProps = AuthRequest & Partial<CreatePatientInputs>;
+
+const createPatientsMutation = async ({
+  user_token,
+  patient_name,
+  patient_email,
+  patient_address,
+  patient_birth,
+  patient_cellphone,
+  patient_cpf,
+  patient_phone,
+  patient_sex,
+  patient_zip,
+}: CreatePatientsMutationProps) => {
+  return httpClient.post({
+    path: `/patients`,
+    options: {
+      headers: {
+        Authorization: `Bearer ${user_token}`,
+      },
+      body: JSON.stringify({
+        patient_name,
+        patient_email,
+        patient_address,
+        patient_birth,
+        patient_cellphone,
+        patient_cpf,
+        patient_phone,
+        patient_sex,
+        patient_zip,
+      }),
+    },
+  });
+};
+
+type DelePatientsProps = {
+  patient_id: string;
+  user_token: string;
+};
+
+const deletePatientsMutation = async ({
+  patient_id,
+  user_token,
+}: DelePatientsProps) => {
+  return httpClient.delete({
+    path: `/patients/${patient_id}`,
+    options: {
+      headers: {
+        Authorization: `Bearer ${user_token}`,
+      },
+    },
+  });
+};
+
+export {
+  signUpMutation,
+  updateUserMutation,
+  createPatientsMutation,
+  deletePatientsMutation,
+};

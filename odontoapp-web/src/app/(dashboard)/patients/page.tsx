@@ -8,49 +8,52 @@ import { FormProvider, useForm } from "react-hook-form";
 import CreatePatientForm from "./_components/Forms/CreatePatient";
 import { usePatients } from "./_hooks/usePatients";
 import ScheduleAppointmentForm from "./_components/Forms/ScheduleAppointment";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { createPatientsSchema } from "@/utils/schemas";
+import Spinner from "@/app/_components/Spinner";
 
 export type CreatePatientInputs = {
   patient_name: string;
   patient_email: string;
   patient_address: string;
-  patient_address_number: string;
   patient_zip: string;
   patient_phone: string;
+  patient_cellphone: string;
   patient_cpf: string;
   patient_birth: string;
-  patient_sex: string | number;
-  patient_taking_medicine: string | number;
-  patient_taking_medicine_description: string;
-  patient_in_medical_treatment: string | number;
-  patient_in_medical_treatment_description: string;
-  patient_has_allergy: string | number;
-  patient_has_allergy_description: string;
-  patient_blood_pressure: string | number;
-  patient_has_heart_problems: string | number;
-  patient_has_heart_problems_description: string;
-  patient_has_rheumatic_fever: string | number;
-  patient_has_diabetes: string | number;
-  patient_bleeding_level: string | number;
-  patient_healing_level: string | number;
-  patient_has_hepatitis: string | number;
-  patient_has_breathing_problems: string | number;
-  patient_has_gastric_problems: string | number;
-  patient_has_joint_problems_or_rheumatism: string | number;
-  patient_has_hiv: string | number;
-  patient_desease_description: string;
-  patient_has_anesthesia_reaction: string | number;
-  patient_has_anesthesia_reaction_description: string;
-  patient_has_teeth_gum_pain: string | number;
-  patient_has_gum_bleeding: string | number;
-  patient_has_pain_ear_area: string | number;
-  patient_has_difficulty_opening_mouth: string | number;
-  patient_grind_clench_teeth: string | number;
-  patient_smokes: string | number;
-  patient_alcohol: string | number;
-  patient_pregnant_lactating: string | number;
-  patient_has_important_information: string | number;
-  patient_has_important_information_description: string;
-  patient_bio_confirmation: string | number;
+  patient_sex: "M" | "F" | "";
+  // patient_taking_medicine: string | number;
+  // patient_taking_medicine_description: string;
+  // patient_in_medical_treatment: string | number;
+  // patient_in_medical_treatment_description: string;
+  // patient_has_allergy: string | number;
+  // patient_has_allergy_description: string;
+  // patient_blood_pressure: string | number;
+  // patient_has_heart_problems: string | number;
+  // patient_has_heart_problems_description: string;
+  // patient_has_rheumatic_fever: string | number;
+  // patient_has_diabetes: string | number;
+  // patient_bleeding_level: string | number;
+  // patient_healing_level: string | number;
+  // patient_has_hepatitis: string | number;
+  // patient_has_breathing_problems: string | number;
+  // patient_has_gastric_problems: string | number;
+  // patient_has_joint_problems_or_rheumatism: string | number;
+  // patient_has_hiv: string | number;
+  // patient_desease_description: string;
+  // patient_has_anesthesia_reaction: string | number;
+  // patient_has_anesthesia_reaction_description: string;
+  // patient_has_teeth_gum_pain: string | number;
+  // patient_has_gum_bleeding: string | number;
+  // patient_has_pain_ear_area: string | number;
+  // patient_has_difficulty_opening_mouth: string | number;
+  // patient_grind_clench_teeth: string | number;
+  // patient_smokes: string | number;
+  // patient_alcohol: string | number;
+  // patient_pregnant_lactating: string | number;
+  // patient_has_important_information: string | number;
+  // patient_has_important_information_description: string;
+  // patient_bio_confirmation: string | number;
 };
 
 export type ScheduleAppointmentInputs = {
@@ -65,6 +68,7 @@ const PatientsPage: React.FC = () => {
   const [showScheduleAppointment, setShowScheduleAppointment] = useState(false);
   const {
     state: { selected: selectedPatient },
+    queryReturn,
   } = usePatients();
 
   const createPatientMethods = useForm<CreatePatientInputs>({
@@ -72,45 +76,46 @@ const PatientsPage: React.FC = () => {
       patient_name: "",
       patient_email: "",
       patient_address: "",
-      patient_address_number: "",
       patient_zip: "",
+      patient_cellphone: "",
       patient_phone: "",
       patient_cpf: "",
       patient_birth: "",
-      patient_sex: "",
-      patient_taking_medicine: 0,
-      patient_taking_medicine_description: "",
-      patient_in_medical_treatment: 0,
-      patient_in_medical_treatment_description: "",
-      patient_has_allergy: 0,
-      patient_has_allergy_description: "",
-      patient_blood_pressure: 0,
-      patient_has_heart_problems: 0,
-      patient_has_heart_problems_description: "",
-      patient_has_rheumatic_fever: 0,
-      patient_has_diabetes: 0,
-      patient_bleeding_level: 0,
-      patient_healing_level: 0,
-      patient_has_hepatitis: 0,
-      patient_has_breathing_problems: 0,
-      patient_has_gastric_problems: 0,
-      patient_has_joint_problems_or_rheumatism: 0,
-      patient_has_hiv: 0,
-      patient_desease_description: "",
-      patient_has_anesthesia_reaction: 0,
-      patient_has_anesthesia_reaction_description: "",
-      patient_has_teeth_gum_pain: 0,
-      patient_has_gum_bleeding: 0,
-      patient_has_pain_ear_area: 0,
-      patient_has_difficulty_opening_mouth: 0,
-      patient_grind_clench_teeth: 0,
-      patient_smokes: 0,
-      patient_alcohol: 0,
-      patient_pregnant_lactating: 0,
-      patient_has_important_information: 0,
-      patient_has_important_information_description: "",
-      patient_bio_confirmation: 0,
+      patient_sex: "M",
+      // patient_taking_medicine: 0,
+      // patient_taking_medicine_description: "",
+      // patient_in_medical_treatment: 0,
+      // patient_in_medical_treatment_description: "",
+      // patient_has_allergy: 0,
+      // patient_has_allergy_description: "",
+      // patient_blood_pressure: 0,
+      // patient_has_heart_problems: 0,
+      // patient_has_heart_problems_description: "",
+      // patient_has_rheumatic_fever: 0,
+      // patient_has_diabetes: 0,
+      // patient_bleeding_level: 0,
+      // patient_healing_level: 0,
+      // patient_has_hepatitis: 0,
+      // patient_has_breathing_problems: 0,
+      // patient_has_gastric_problems: 0,
+      // patient_has_joint_problems_or_rheumatism: 0,
+      // patient_has_hiv: 0,
+      // patient_desease_description: "",
+      // patient_has_anesthesia_reaction: 0,
+      // patient_has_anesthesia_reaction_description: "",
+      // patient_has_teeth_gum_pain: 0,
+      // patient_has_gum_bleeding: 0,
+      // patient_has_pain_ear_area: 0,
+      // patient_has_difficulty_opening_mouth: 0,
+      // patient_grind_clench_teeth: 0,
+      // patient_smokes: 0,
+      // patient_alcohol: 0,
+      // patient_pregnant_lactating: 0,
+      // patient_has_important_information: 0,
+      // patient_has_important_information_description: "",
+      // patient_bio_confirmation: 0,
     },
+    resolver: yupResolver(createPatientsSchema),
   });
 
   const scheduleAppointmentMethods = useForm<ScheduleAppointmentInputs>({
@@ -161,7 +166,20 @@ const PatientsPage: React.FC = () => {
       </div>
       <div className="bg-white w-full h-full rounded-lg shadow-sm shadow-gray-500 flex flex-col gap-4">
         <Header />
-        <Table onScheduleAppointment={handleScheduleAppointmentClick} />
+        {queryReturn?.isLoading ? (
+          <div className="w-full h-full flex items-center justify-center">
+            <Spinner
+              size="w-24 h-24"
+              fill="fill-blue-700"
+              trail="text-blue-200"
+            />
+          </div>
+        ) : (
+          <Table
+            onEmptyList={handleCreatePatientClick}
+            onScheduleAppointment={handleScheduleAppointmentClick}
+          />
+        )}
       </div>
 
       {showCreatePatientForm && (
