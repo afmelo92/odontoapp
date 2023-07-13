@@ -327,10 +327,13 @@ const PatientsContextProvider = ({ children }: ProviderProps) => {
 
   const filterFn = useCallback(
     (patient: Patient) =>
-      patient.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      patient.email.toLowerCase().includes(searchValue.toLowerCase()) ||
+      patient.name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      patient.email?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      patient.cpf?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      patient.birth?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      patient.cellphone?.toLowerCase().includes(searchValue.toLowerCase()) ||
       patient.doctor?.toLowerCase().includes(searchValue.toLowerCase()) ||
-      patient.sex.toLowerCase().includes(searchValue.toLowerCase()),
+      patient.sex?.toLowerCase().includes(searchValue.toLowerCase()),
     [searchValue]
   );
 
