@@ -6,16 +6,23 @@ import { useCallback, useState } from "react";
 import SideDetails from "@/app/_components/SideDetails";
 import { FormProvider, useForm } from "react-hook-form";
 import CreateProstheticOrderForm from "./_components/Forms/CreateProstheticOrder";
+import { addDays } from "date-fns";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { createProstheticsOrderSchema } from "@/utils/schemas";
 
 export type CreateProstheticsInputs = {
-  prosthetic_order_provider_id: number;
+  prosthetic_order_user_role: string;
   prosthetic_order_patient_name: string;
+  prosthetic_order_clinic_name: string;
+  prosthetic_order_dentist_name: string;
+  prosthetic_order_description: string;
+  prosthetic_order_lab_uid: string;
+  prosthetic_order_patient_uid: string;
+  prosthetic_order_service_id: string;
+  prosthetic_order_color_id: string;
   prosthetic_order_teeth_elements: number[];
-  prosthetic_order_deadline: string | number | readonly string[] | undefined;
-  prosthetic_order_service: string;
-  prosthetic_order_material: string;
-  prosthetic_order_color: string;
-  prosthetic_order_details: string;
+  prosthetic_order_options_id: string;
+  prosthetic_order_deadline: string | number | readonly string[];
 };
 
 const ProstheticsPage: React.FC = () => {
@@ -25,15 +32,22 @@ const ProstheticsPage: React.FC = () => {
   const createProstheticOrderMethods = useForm<CreateProstheticsInputs>({
     mode: "onSubmit",
     defaultValues: {
-      prosthetic_order_provider_id: 1,
-      prosthetic_order_patient_name: "",
+      prosthetic_order_lab_uid: "",
+      prosthetic_order_patient_uid: "",
       prosthetic_order_teeth_elements: [],
-      prosthetic_order_deadline: "",
-      prosthetic_order_service: "",
-      prosthetic_order_material: "",
-      prosthetic_order_color: "",
-      prosthetic_order_details: "",
+      prosthetic_order_deadline: addDays(new Date(), 9)
+        .toISOString()
+        .split("T")[0],
+      prosthetic_order_service_id: "",
+      prosthetic_order_color_id: "",
+      prosthetic_order_description: "",
+      prosthetic_order_clinic_name: "",
+      prosthetic_order_dentist_name: "",
+      prosthetic_order_patient_name: "",
+      prosthetic_order_options_id: "",
+      prosthetic_order_user_role: "",
     },
+    resolver: yupResolver(createProstheticsOrderSchema),
   });
 
   const handleCreateProstheticOrderClick = useCallback((status: boolean) => {

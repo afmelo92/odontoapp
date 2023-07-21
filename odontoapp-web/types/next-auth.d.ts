@@ -2,6 +2,26 @@
 import { User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 
+type Color = { id: number; group: number; title: string };
+
+type Option = {
+  id: number;
+  title: string;
+  price: number;
+  elements?: number[];
+};
+
+type Service = {
+  id: number;
+  title: string;
+  description: string | null;
+  category: number;
+  options: Option[];
+  elements: boolean;
+  colors: number;
+  price: number | null;
+};
+
 interface IUser extends User {
   address?: string | null;
   post?: string | null;
@@ -9,6 +29,9 @@ interface IUser extends User {
   cpf?: string | null;
   id?: string;
   cro?: string | null;
+  role?: string | null;
+  services?: Service[];
+  colorScale?: Color[];
   company?: {
     name?: string | null;
     cnpj?: string | null;

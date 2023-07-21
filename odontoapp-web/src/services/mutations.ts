@@ -34,7 +34,7 @@ type AuthRequest = {
   user_token: string;
 };
 
-type CompleteUpdatProps = {
+type UpdateUserProps = {
   user_id: string;
   user_token: string;
 } & Partial<UpdateUserProfileInputs> &
@@ -61,7 +61,7 @@ const updateUserMutation = async ({
   company_primary_email,
   company_secondary_email,
   company_website,
-}: CompleteUpdatProps) => {
+}: UpdateUserProps) => {
   return httpClient.put({
     path: `/users/${user_id}`,
     options: {
@@ -146,9 +146,62 @@ const deletePatientsMutation = async ({
   });
 };
 
+type CreateProstheticsOrderProps = {
+  user_token: string;
+  prosthetic_order_teeth_elements: number[];
+  prosthetic_order_deadline: string | number | readonly string[] | undefined;
+  prosthetic_order_service_id: string;
+  prosthetic_order_options_id: string;
+  prosthetic_order_color_id: string;
+  prosthetic_order_description: string;
+  prosthetic_order_patient_uid?: string;
+  prosthetic_order_lab_uid?: string;
+  prosthetic_order_clinic_name?: string;
+  prosthetic_order_dentist_name?: string;
+  prosthetic_order_patient_name?: string;
+};
+
+const createProstheticsOrderMutation = async ({
+  user_token,
+  prosthetic_order_patient_uid = "",
+  prosthetic_order_teeth_elements = [],
+  prosthetic_order_deadline,
+  prosthetic_order_service_id = "",
+  prosthetic_order_options_id = "",
+  prosthetic_order_color_id = "",
+  prosthetic_order_description = "",
+  prosthetic_order_lab_uid = "",
+  prosthetic_order_clinic_name = "",
+  prosthetic_order_dentist_name = "",
+  prosthetic_order_patient_name = "",
+}: CreateProstheticsOrderProps) => {
+  return httpClient.post({
+    path: `/prosthetics/orders`,
+    options: {
+      headers: {
+        Authorization: `Bearer ${user_token}`,
+      },
+      body: JSON.stringify({
+        prosthetic_order_patient_uid,
+        prosthetic_order_teeth_elements,
+        prosthetic_order_deadline,
+        prosthetic_order_service_id,
+        prosthetic_order_options_id,
+        prosthetic_order_color_id,
+        prosthetic_order_description,
+        prosthetic_order_lab_uid,
+        prosthetic_order_clinic_name,
+        prosthetic_order_dentist_name,
+        prosthetic_order_patient_name,
+      }),
+    },
+  });
+};
+
 export {
   signUpMutation,
   updateUserMutation,
   createPatientsMutation,
   deletePatientsMutation,
+  createProstheticsOrderMutation,
 };
