@@ -163,6 +163,9 @@ describe('/users', () => {
           'address',
           'birth',
           'post',
+          'colorScale',
+          'role',
+          'services',
         ].sort()
       );
       expect(response.body).toEqual({
@@ -751,12 +754,12 @@ describe('/users', () => {
   });
 
   describe('/users/:id :: GET', () => {
-    it('should return status 400 and error message when invalid id is sent', async () => {
+    it('should return status 403 and error message when invalid id is sent', async () => {
       const response = await request(myAppInstance)
         .get(`/users/invalid-id`)
         .set('Authorization', `Bearer ${authenticatedAdmin.token}`);
 
-      expect(response.statusCode).toEqual(400);
+      expect(response.statusCode).toEqual(403);
       expect(response.headers['content-type']).toMatch(/json/);
       expect(response.body).toEqual({
         message: 'Invalid id.',
