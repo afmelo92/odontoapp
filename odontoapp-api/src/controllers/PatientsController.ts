@@ -107,6 +107,14 @@ class PatientsController {
 
     newPatient.set('sex', patient_sex === 'M');
 
+    // check if the value is a date
+    if (isNaN(new Date(patient_birth).valueOf())) {
+      return res.status(400).json({
+        message: 'Invalid birth date.',
+        fields: ['patient_birth'],
+      });
+    }
+
     if (isAfter(new Date(patient_birth), new Date())) {
       return res.status(400).json({
         message: 'Invalid birth date.',
@@ -129,6 +137,13 @@ class PatientsController {
     newPatient.set('address', patient_address);
 
     const sanitizedZip = patient_zip.replace(/[^0-9]/g, '');
+
+    if (sanitizedZip.length < 8) {
+      return res.status(400).json({
+        message: 'Invalid zipcode.',
+        fields: ['patient_zip'],
+      });
+    }
 
     newPatient.set('zip_code', sanitizedZip);
 
