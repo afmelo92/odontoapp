@@ -7,6 +7,7 @@ import personalAction from './middlewares/personalAction';
 import PatientsController from './controllers/PatientsController';
 import ProstheticsOrdersController from './controllers/ProstheticsOrdersController';
 import ServicesController from './controllers/ServicesController';
+import isDentist from './middlewares/isDentist';
 
 const router = Router();
 
@@ -35,7 +36,7 @@ router.get('/users/:id', isAuthenticated, personalAction, UsersController.show);
 router.delete('/users/:id', isAuthenticated, isAdmin, UsersController.delete);
 
 // PATIENTS
-router.post('/patients', isAuthenticated, PatientsController.create);
+router.post('/patients', isAuthenticated, isDentist, PatientsController.create);
 router.get(
   '/patients/:id',
   isAuthenticated,
