@@ -113,6 +113,7 @@ class PatientsController {
         fields: ['patient_birth'],
       });
     }
+
     newPatient.set('birth', new Date(patient_birth).toISOString());
 
     const sanitizedPhone = patient_cellphone.replace(/[^0-9]/g, '');

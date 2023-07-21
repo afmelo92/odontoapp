@@ -53,6 +53,7 @@ export default async function isAuthenticated(
       role,
       email,
       company: {
+        uid: user.company?.uid,
         primary_email: user.company?.primary_email,
         secondary_email: user.company?.secondary_email,
         cnpj: user.company?.cnpj,

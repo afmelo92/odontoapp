@@ -6,6 +6,7 @@ declare namespace Express {
       email: string;
       role: 'ADMIN' | 'DENTIST' | 'LAB' | 'PATIENT';
       company: {
+        uid: string | undefined;
         primary_email: string | null | undefined;
         secondary_email: string | null | undefined;
         cnpj: string | null | undefined;

@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import config from '@/etc/config';
 import { validateEmail } from '@/utils/validators';
 import UsersRepository from '@/repositories/UsersRepository';
-
+import { newServices, colorScale } from '@/etc/constants';
 class SessionsController {
   async create(req: Request, res: Response) {
     const { email, password } = req.body;
@@ -35,6 +35,7 @@ class SessionsController {
         name: true,
         phone: true,
         password: true,
+        role: true,
         company: {
           select: {
             address: true,
@@ -85,6 +86,8 @@ class SessionsController {
       role: user.role,
       birth: user.birth,
       post: user.post,
+      services: newServices,
+      colorScale,
     };
 
     return res.json({
