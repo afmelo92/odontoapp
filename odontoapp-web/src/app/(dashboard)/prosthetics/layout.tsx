@@ -1,3 +1,4 @@
+import { PatientsContextProvider } from "../patients/_contexts/PatientsContext";
 import { ProstheticsContextProvider } from "./_contexts/ProstheticsContext";
 
 type ProstheticsLayoutProps = {
@@ -5,7 +6,11 @@ type ProstheticsLayoutProps = {
 };
 
 const ProstheticsLayout: React.FC<ProstheticsLayoutProps> = ({ children }) => {
-  return <ProstheticsContextProvider>{children}</ProstheticsContextProvider>;
+  return (
+    <PatientsContextProvider>
+      <ProstheticsContextProvider>{children}</ProstheticsContextProvider>
+    </PatientsContextProvider>
+  );
 };
 
 export default ProstheticsLayout;
