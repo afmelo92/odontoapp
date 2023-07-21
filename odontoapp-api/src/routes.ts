@@ -5,6 +5,8 @@ import isAuthenticated from './middlewares/isAuthenticated';
 import isAdmin from './middlewares/isAdmin';
 import personalAction from './middlewares/personalAction';
 import PatientsController from './controllers/PatientsController';
+import ProstheticsOrdersController from './controllers/ProstheticsOrdersController';
+import ServicesController from './controllers/ServicesController';
 
 const router = Router();
 
@@ -47,6 +49,26 @@ router.delete(
   personalAction,
   PatientsController.delete
 );
+
+// DENTISTS
+router.get('/dentists', (req, res) => {
+  res.json({ dentists: [] });
+});
+
+// LABS
+router.get('/labs', (req, res) => {
+  res.json({ labs: [] });
+});
+
+// PROSTHETICS ORDERS
+router.post(
+  '/prosthetics/orders',
+  isAuthenticated,
+  ProstheticsOrdersController.create
+);
+
+// SERVICES
+router.get('/services', isAuthenticated, ServicesController.index);
 
 export default router;
 
