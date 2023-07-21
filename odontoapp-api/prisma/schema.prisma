@@ -18,60 +18,160 @@ enum Role {
 }
 
 model Users {
-  id            Int         @id     @default(autoincrement())
-  uid           String      @unique @default(uuid())
-  email         String      @unique
-  name          String
-  cro           String?
-  cellphone     String?
-  phone         String?
-  cpf           String?     @unique
-  address       String?
-  password      String
-  birth         DateTime?   @db.Date
-  post          String?
-  active        Boolean?    @default(true)
-  role          Role        @default(DENTIST)
-  company       Companies?  @relation("owner")
-  employee      Companies?  @relation(fields: [employee_uid], references: [uid])
-  employee_uid  String?     @unique
-  patients      Patients[]
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id              Int                 @id     @default(autoincrement())
+  uid             String              @unique @default(uuid())
+  email           String              @unique
+  name            String
+  cro             String?
+  cellphone       String?
+  phone           String?
+  cpf             String?             @unique
+  address         String?
+  password        String
+  birth           DateTime?           @db.Date
+  post            String?
+  active          Boolean?            @default(true)
+  role            Role                @default(DENTIST)
+  company         Companies?          @relation("owner")
+  employee        Companies?          @relation("employee", fields: [employee_uid], references: [uid])
+  employee_uid    String?             @unique
+  patients        Patients[]
+  dentist_orders  ProstheticOrders[]  @relation("dentist")
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
 }
 
 model Companies {
-  id              Int       @id     @default(autoincrement())
-  uid             String    @unique @default(uuid())
-  primary_email   String?   @unique
-  secondary_email String?   @unique
+  id              Int                 @id     @default(autoincrement())
+  uid             String              @unique @default(uuid())
+  primary_email   String?             @unique
+  secondary_email String?             @unique
   name            String?
-  cnpj            String?   @unique
+  cnpj            String?             @unique
   cellphone       String?
   phone           String?
-  owner           Users     @relation("owner", fields: [owner_id], references: [id], onDelete: Cascade)
-  owner_id        Int       @unique
-  employees       Users[]
+  owner           Users?              @relation("owner", fields: [owner_uid], references: [uid], onDelete: Cascade)
+  owner_uid       String?             @unique @default(uuid())
+  employees       Users[]             @relation("employee")
+  orders          ProstheticOrders[]  @relation("lab")
   address         String?
   website         String?
-  active          Boolean?  @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  // services        Json
+  // services        Service[]           @relation("service_company")
+  // categories      Category[]          @relation("category_company")
+  active          Boolean?            @default(true)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
 }
 
 model Patients {
-  id        Int       @id     @default(autoincrement())
-  uid       String    @unique @default(uuid())
-  email     String?   @unique
-  name      String
-  cellphone String?
-  cpf       String    @unique
-  address   String?
-  zip_code  String?
-  birth     DateTime? @db.Date
-  sex       Boolean?
-  dentists  Users[]
-  role      Role      @default(PATIENT)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id          Int                 @id     @default(autoincrement())
+  uid         String              @unique @default(uuid())
+  email       String?             @unique
+  name        String
+  cellphone   String?
+  cpf         String              @unique
+  address     String?
+  zip_code    String?
+  birth       DateTime?           @db.Date
+  sex         Boolean?
+  dentists    Users[]
+  role        Role                @default(PATIENT)
+  p_orders    ProstheticOrders[]  @relation("patient")
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
 }
+
+model ProstheticOrders {
+  id                Int                 @id     @default(autoincrement())
+  uid               String              @unique @default(uuid())
+  patient           Patients?           @relation("patient", fields: [patient_uid], references: [uid], onDelete: NoAction)
+  patient_uid       String?
+  dentist_name      String?
+  patient_name      String?
+  dentist_clinic    String?
+  dentist           Users?              @relation("dentist", fields: [dentist_uid], references: [uid], onDelete: NoAction)
+  dentist_uid       String?
+  lab               Companies           @relation("lab", fields: [lab_uid], references: [uid], onDelete: NoAction )
+  lab_uid           String
+  description       String?
+  service_name      String?
+  service_material  String?
+  service_color     String?
+  service_deadline  DateTime            @db.Date
+  delivered_at      DateTime?           @db.Date
+  status            Int
+  elements          Int[]
+  sequence          Int?
+  master_uid        String?
+  master            ProstheticOrders?   @relation("master_complements", fields: [master_uid], references: [uid])
+  complements       ProstheticOrders[]  @relation("master_complements")
+  total             Int                 @default(0)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+}
+
+// model Service {
+//   id                Int       @id     @default(autoincrement())
+//   uid               String    @unique @default(uuid())
+//   title             String
+//   description       String?
+//   category          Category  @relation("service_category", fields: [category_uid], references: [uid])
+//   category_uid      String
+//   price             Int
+//   owner             Companies @relation("service_company", fields: [company_uid], references: [uid])
+//   company_uid       String
+//   createdAt         DateTime  @default(now())
+//   updatedAt         DateTime  @updatedAt
+// }
+
+// model Category { 
+//   id                Int       @id     @default(autoincrement())
+//   uid               String    @unique @default(uuid())
+//   title             String
+//   description       String?
+//   services          Service[] @relation("service_category")
+//   owner             Companies @relation("category_company", fields: [company_uid], references: [uid])
+//   company_uid       String
+//   createdAt         DateTime  @default(now())
+//   updatedAt         DateTime  @updatedAt
+// }
+
+
+// model Labs {
+//   id              Int       @id     @default(autoincrement())
+//   uid             String    @unique @default(uuid())
+//   primary_email   String?   @unique
+//   secondary_email String?   @unique
+//   name            String?
+//   cnpj            String?   @unique
+//   cellphone       String?
+//   phone           String?
+//   owner           Users     @relation("owner", fields: [owner_uid], references: [uid], onDelete: Cascade)
+//   owner_uid       String    @unique
+//   employees       Users[]
+//   address         String?
+//   website         String?
+//   active          Boolean?  @default(true)
+//   createdAt       DateTime  @default(now())
+//   updatedAt       DateTime  @updatedAt
+// }
+
+// model Clinics {
+//   id              Int       @id     @default(autoincrement())
+//   uid             String    @unique @default(uuid())
+//   primary_email   String?   @unique
+//   secondary_email String?   @unique
+//   name            String?
+//   cnpj            String?   @unique
+//   cellphone       String?
+//   phone           String?
+//   owner           Users     @relation("owner", fields: [owner_uid], references: [uid], onDelete: Cascade)
+//   owner_uid       String    @unique
+//   employees       Users[]
+//   address         String?
+//   website         String?
+//   active          Boolean?  @default(true)
+//   createdAt       DateTime  @default(now())
+//   updatedAt       DateTime  @updatedAt
+// }
