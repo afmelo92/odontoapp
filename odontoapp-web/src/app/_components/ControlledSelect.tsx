@@ -27,6 +27,7 @@ const ControlledSelect = forwardRef<HTMLSelectElement, ControlledSelectProps>(
       loading = false,
       error = "",
       defaultValue = "",
+      disabled = false,
       ...rest
     },
     ref
@@ -43,13 +44,15 @@ const ControlledSelect = forwardRef<HTMLSelectElement, ControlledSelectProps>(
           id="select-container"
           data-error={Boolean(error)}
           data-loading={loading}
+          data-disabled={disabled}
           className="group relative flex items-center gap-2 
             caret-blue-500 
             stroke-gray-400
             focus-within:stroke-blue-500
             data-[loading=true]:stroke-gray-500 
             data-[loading=true]:border-gray-500
-            data-[error=true]:stroke-red-500"
+            data-[error=true]:stroke-red-500
+            "
         >
           <span className="sr-only">{label}</span>
           {leftIcon && (
@@ -62,7 +65,7 @@ const ControlledSelect = forwardRef<HTMLSelectElement, ControlledSelectProps>(
             </span>
           )}
           <select
-            disabled={loading}
+            disabled={loading || disabled}
             className={`w-full block rounded-xl
             ${leftIcon ? "pl-8" : "pl-4"} 
             ${sizeType === "base" ? "py-2" : "py-3"}
@@ -80,6 +83,9 @@ const ControlledSelect = forwardRef<HTMLSelectElement, ControlledSelectProps>(
               group-data-[error=true]:outline-none
             group-data-[error=true]:border-red-500
             group-data-[error=true]:text-red-500
+            disabled:cursor-not-allowed
+            group-data-[disabled=true]:bg-gray-400
+
             `}
             {...rest}
             ref={ref}

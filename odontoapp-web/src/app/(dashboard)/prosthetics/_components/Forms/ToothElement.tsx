@@ -5,18 +5,27 @@ type ToothElementProps = {
   selected: boolean;
   // eslint-disable-next-line no-unused-vars
   onSelect: (id: number) => void;
+  disabled?: boolean;
 };
 const ToothElement: React.FC<ToothElementProps> = ({
   id,
   selected = false,
   onSelect,
+  disabled = false,
 }) => {
   return (
-    <p
+    <button
+      type="button"
       id={`tooth-${id}`}
       data-selected={selected}
-      className="flex flex-col items-center justify-center gap-1 text-[10px] fill-none data-[selected=true]:fill-blue-500 cursor-pointer"
+      className="flex flex-col items-center justify-center gap-1 text-[10px] 
+      fill-none 
+      data-[selected=true]:fill-blue-500 
+      cursor-pointer 
+      disabled:cursor-not-allowed
+      disabled:fill-gray-300"
       onClick={() => onSelect(id)}
+      disabled={disabled}
     >
       {id < 31 && id}
       <span>
@@ -27,7 +36,7 @@ const ToothElement: React.FC<ToothElementProps> = ({
         })}
       </span>
       {id >= 31 && id}
-    </p>
+    </button>
   );
 };
 
