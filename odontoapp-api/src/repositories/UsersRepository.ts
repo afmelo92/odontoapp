@@ -53,6 +53,11 @@ type DisconnectPatientProps = {
   patientId: string;
 };
 
+type FindUserPatientByCPFProps = {
+  userUid: string;
+  patientCPF: string;
+};
+
 export const safePatientSelectSet: Prisma.PatientsSelect = {
   name: true,
   email: true,
@@ -296,6 +301,33 @@ class UsersRepository {
     });
 
     return user;
+  }
+
+  public async findUserPatientByCPF({
+    userUid,
+    patientCPF,
+  }: FindUserPatientByCPFProps) {
+    const patient = await prisma.users.findFirst({
+      where: {
+        uid: userUid,
+        patients: {
+          some: {
+            cpf: {
+              equals: patientCPF,
+            },
+          },
+        },
+      },
+      select: {
+        patients: {
+          where: {
+            cpf: patientCPF,
+          },
+        },
+      },
+    });
+
+    return patient;
   }
 }
 

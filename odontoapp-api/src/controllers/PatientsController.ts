@@ -5,7 +5,6 @@ import { Request, Response } from 'express';
 import { isAfter } from 'date-fns';
 import { Patients } from '@prisma/client';
 import UsersRepository from '@/repositories/UsersRepository';
-import prisma from '@/db';
 
 type CreatePatientBody = {
   patient_name: string;
@@ -60,25 +59,11 @@ class PatientsController {
       });
     }
 
-    const alreadyRegisteredPatientForThisUser = await prisma.users.findFirst({
-      where: {
-        uid: req_id,
-        patients: {
-          some: {
-            cpf: {
-              equals: sanitizedCPF,
-            },
-          },
-        },
-      },
-      select: {
-        patients: {
-          where: {
-            cpf: sanitizedCPF,
-          },
-        },
-      },
-    });
+    const alreadyRegisteredPatientForThisUser =
+      await UsersRepository.findUserPatientByCPF({
+        userUid: req_id,
+        patientCPF: sanitizedCPF,
+      });
 
     if (alreadyRegisteredPatientForThisUser) {
       return res.status(400).json({
