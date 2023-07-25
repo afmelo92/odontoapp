@@ -1,5 +1,6 @@
 import prisma from '@/db';
 import { colorScale, newServices } from '@/etc/constants';
+import ProstheticOrdersRepository from '@/repositories/ProstheticOrdersRepository';
 import { mapBodyErrorFields } from '@/utils';
 import { validateUUID } from '@/utils/validators';
 import { ProstheticOrders } from '@prisma/client';
@@ -42,13 +43,17 @@ class ProstheticsOrdersController {
         });
       }
 
-      if (
-        !validateUUID(prosthetic_order_patient_uid) ||
-        !validateUUID(prosthetic_order_lab_uid)
-      ) {
+      if (!validateUUID(prosthetic_order_patient_uid)) {
+        return res.status(400).json({
+          message: 'Invalid patient id.',
+          fields: ['prosthetic_order_patient_uid'],
+        });
+      }
+
+      if (!validateUUID(prosthetic_order_lab_uid)) {
         return res.status(400).json({
           message: 'Invalid patient/lab id.',
-          fields: ['patient_uid', 'lab_id'],
+          fields: ['prosthetic_order_lab_uid'],
         });
       }
 
@@ -68,6 +73,7 @@ class ProstheticsOrdersController {
       if (!patient) {
         return res.status(400).json({
           message: 'Patient not found',
+          fields: ['prosthetic_order_patient_uid'],
         });
       }
 
@@ -76,6 +82,7 @@ class ProstheticsOrdersController {
       if (!lab) {
         return res.status(400).json({
           message: 'Lab not found',
+          fields: ['prosthetic_order_lab_uid'],
         });
       }
 
@@ -113,6 +120,13 @@ class ProstheticsOrdersController {
       );
     }
 
+    if (isNaN(new Date(prosthetic_order_deadline).valueOf())) {
+      return res.status(400).json({
+        message: 'Invalid deadline.',
+        fields: ['prosthetic_order_deadline'],
+      });
+    }
+
     if (isBefore(new Date(prosthetic_order_deadline), new Date())) {
       return res.status(400).json({
         message: 'Invalid deadline.',
@@ -136,6 +150,8 @@ class ProstheticsOrdersController {
       });
     }
 
+    currentTotal = hasService.price || 0;
+
     newProstheticOrder.set('service_name', hasService.title);
 
     if (hasService.elements && prosthetic_order_teeth_elements.length <= 0) {
@@ -147,21 +163,24 @@ class ProstheticsOrdersController {
 
     if (!Array.isArray(prosthetic_order_teeth_elements)) {
       return res.status(400).json({
-        message: 'Invalid array of elements.',
+        message: 'Invalid elements.',
         fields: ['prosthetic_order_teeth_elements'],
       });
     }
 
+    let hasInvalidValue = false;
     prosthetic_order_teeth_elements.forEach((el) => {
       if (typeof el !== 'number') {
-        return res.status(400).json({
-          message: 'Invalid element value.',
-          fields: ['prosthetic_order_teeth_elements'],
-        });
+        hasInvalidValue = true;
       }
     });
 
-    currentTotal = hasService.price || 0;
+    if (hasInvalidValue) {
+      return res.status(400).json({
+        message: 'Invalid elements.',
+        fields: ['prosthetic_order_teeth_elements'],
+      });
+    }
 
     newProstheticOrder.set('elements', prosthetic_order_teeth_elements);
     newProstheticOrder.set('service_material', null);
@@ -209,7 +228,6 @@ class ProstheticsOrdersController {
     }
 
     newProstheticOrder.set('description', prosthetic_order_description || null);
-    newProstheticOrder.set('status', 1);
 
     const newProstheticOrderData = {} as Omit<
       ProstheticOrders,
@@ -223,13 +241,11 @@ class ProstheticsOrdersController {
       });
     });
 
-    const order = await prisma.prostheticOrders.create({
-      data: {
-        ...newProstheticOrderData,
-      },
+    await ProstheticOrdersRepository.createProstheticOrder({
+      ...newProstheticOrderData,
     });
 
-    return res.status(201).json({ message: 'ok', data: order });
+    return res.status(201).json({ message: 'ok' });
   }
 }
 
