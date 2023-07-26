@@ -2,6 +2,14 @@
 import { User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 
+type MenuItem = {
+  uid: string;
+  title: string;
+  href: string;
+  icon: string;
+  sub: MenuItem[];
+};
+
 type Color = { id: number; group: number; title: string };
 
 type Option = {
@@ -32,6 +40,7 @@ interface IUser extends User {
   role?: string | null;
   services?: Service[];
   colorScale?: Color[];
+  menu?: MenuItem[];
   company?: {
     name?: string | null;
     cnpj?: string | null;

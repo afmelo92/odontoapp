@@ -8,6 +8,7 @@ import PatientsController from './controllers/PatientsController';
 import ProstheticsOrdersController from './controllers/ProstheticsOrdersController';
 import ServicesController from './controllers/ServicesController';
 import isDentist from './middlewares/isDentist';
+import MenuController from './controllers/MenuController';
 
 const router = Router();
 
@@ -70,6 +71,17 @@ router.post(
 
 // SERVICES
 router.get('/services', isAuthenticated, ServicesController.index);
+
+// MENU
+router.post('/menu', isAuthenticated, isAdmin, MenuController.create);
+router.get('/menu', isAuthenticated, isAdmin, MenuController.index);
+router.get('/menu/:id', isAuthenticated, personalAction, MenuController.show);
+router.delete(
+  '/menu/:menu_id',
+  isAuthenticated,
+  isAdmin,
+  MenuController.delete
+);
 
 export default router;
 

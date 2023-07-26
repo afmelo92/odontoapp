@@ -5,6 +5,7 @@ import config from '@/etc/config';
 import { validateEmail } from '@/utils/validators';
 import UsersRepository from '@/repositories/UsersRepository';
 import { newServices, colorScale } from '@/etc/constants';
+import MenuRepository from '@/repositories/MenuRepository';
 class SessionsController {
   async create(req: Request, res: Response) {
     const { email, password } = req.body;
@@ -73,6 +74,9 @@ class SessionsController {
       subject: user.uid,
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const menu = await MenuRepository.findByRole({ role: user.role! });
+
     const result = {
       id: user.uid,
       email: user.email,
@@ -88,6 +92,7 @@ class SessionsController {
       post: user.post,
       services: newServices,
       colorScale,
+      menu,
     };
 
     return res.json({
