@@ -115,7 +115,8 @@ model Menu {
   id                Int                 @id     @default(autoincrement())
   uid               String              @unique @default(uuid())
   title             String
-  path              String
+  href              String
+  icon              String
   sub               Json[]
   role              Role[]
   order             Int
