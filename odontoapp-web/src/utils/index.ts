@@ -32,4 +32,33 @@ function zipCodeMask(value: string) {
 function onlyNumbers(value: string) {
   return value.replace(/[^0-9]/g, "");
 }
-export { cnpjMask, cpfMask, cellphoneMask, zipCodeMask, onlyNumbers };
+
+function formatOrderStatus(status: number) {
+  switch (status) {
+    case 1:
+      return "Enviado";
+    case 2:
+      return "Confirmado";
+    case 3:
+      return "Em Produção";
+    case 4:
+      return "Ajuste";
+    case 5:
+      return "Cancelado";
+    case 6:
+      return "Finalizado";
+    case 7:
+      return "Em análise";
+    default:
+      return "";
+  }
+}
+
+export {
+  cnpjMask,
+  cpfMask,
+  cellphoneMask,
+  zipCodeMask,
+  onlyNumbers,
+  formatOrderStatus,
+};

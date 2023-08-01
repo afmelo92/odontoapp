@@ -1,149 +1,81 @@
 "use client";
 
-import { createContext, useReducer } from "react";
-import { PaginationStateProps } from "@/app/_components/Pagination";
 import {
-  Patient,
-  patientsMock,
-} from "@/app/(dashboard)/patients/_contexts/PatientsContext";
+  Dispatch,
+  SetStateAction,
+  createContext,
+  useCallback,
+  useReducer,
+  useState,
+} from "react";
+import usePagination, {
+  Pagination,
+  initialPaginationState,
+} from "@/app/_hooks/usePagination";
+import { useSession } from "next-auth/react";
+import { UseQueryResult, useQuery } from "@tanstack/react-query";
+import { getUserProstheticOrders } from "@/services/queries";
+import { formatOrderStatus } from "@/utils";
 
 export type ProstheticsService = {
   id: number;
-  patient: Patient;
-  age: number;
-  sex: "M" | "F";
-  name: string;
-  deadline: Date | number;
-  formattedDate?: string;
+  uid: string;
+  patient_uid: string;
+  dentist_name: string | null;
+  patient_name: string | null;
+  dentist_clinic: string | null;
+  dentist_uid: string | null;
+  lab_uid: string;
+  description: string | null;
+  service_name: string;
+  service_material: string | null;
+  service_color: string | null;
+  service_deadline: string;
+  delivered_at: string | null;
   status: number;
   formattedStatus?: string;
-  lab: string;
-  confirmed: boolean;
+  elements: number[];
+  sequence: number | null;
+  master_uid: string | null;
+  total: number;
+  createdAt: string;
+  updatedAt: string;
+  lab: {
+    name: string | null;
+  };
+  dentist: {
+    name: string | null;
+  };
+  patient: {
+    name: string | null;
+  };
 };
 
 export type StateProps = {
   searchData: string;
-  services: ProstheticsService[];
+  orders: ProstheticsService[];
   filtered: ProstheticsService[];
-  pagination: PaginationStateProps;
+  selected: ProstheticsService | null;
+  pagination: {
+    index: number;
+    perPage: number;
+    totalPages: number;
+    page: number;
+    next: boolean;
+    prev: boolean;
+  };
 };
 
 export type ActionProps = {
-  type: "SET_NEXT_PAGE" | "SET_PREV_PAGE" | "FILTER_DATA";
+  type: "SET_NEXT_PAGE" | "SET_PREV_PAGE" | "SELECT_ORDER";
   payload?: any;
 };
 
-const mock: ProstheticsService[] = [
-  {
-    id: 1,
-    patient: patientsMock[0],
-    age: 61,
-    sex: "M",
-    name: "Facetas em dissilicato de lítio",
-    deadline: new Date("2023-07-01T13:30:00.000Z"),
-    lab: "Pucci Dental Lab",
-    status: 1,
-    confirmed: true,
-  },
-  {
-    id: 2,
-    patient: patientsMock[1],
-    age: 64,
-    sex: "M",
-    name: "Coroa metalocerâmica sobre implante",
-    deadline: new Date("2023-07-01T15:30:00.000Z"),
-    lab: "Pucci Dental Lab",
-    status: 2,
-    confirmed: false,
-  },
-  {
-    id: 3,
-    patient: patientsMock[2],
-    age: 62,
-    sex: "M",
-    name: "Adesiva",
-    deadline: new Date("2023-07-01T16:30:00.000Z"),
-    lab: "Pucci Dental Lab",
-    status: 1,
-    confirmed: true,
-  },
-  {
-    id: 4,
-    patient: patientsMock[3],
-    age: 44,
-    sex: "M",
-    name: "Onlay/Inlay/Overlay",
-    deadline: new Date("2023-07-02T18:30:00.000Z"),
-    lab: "Pucci Dental Lab",
-    status: 4,
-    confirmed: false,
-  },
-  {
-    id: 5,
-    patient: patientsMock[4],
-    age: 50,
-    sex: "M",
-    name: "Provisório",
-    deadline: new Date("2023-07-03T19:30:00.000Z"),
-    lab: "Pucci Dental Lab",
-    status: 3,
-    confirmed: false,
-  },
-  {
-    id: 6,
-    patient: patientsMock[5],
-    age: 33,
-    sex: "M",
-    name: "Placa de clareamento",
-    deadline: new Date("2023-07-03T20:30:00.000Z"),
-    lab: "Pucci Dental Lab",
-    status: 5,
-    confirmed: true,
-  },
-  {
-    id: 7,
-    patient: patientsMock[6],
-    age: 30,
-    sex: "M",
-    name: "Planejamento digital",
-    deadline: new Date("2023-07-04T11:30:00.000Z"),
-    lab: "Pucci Dental Lab",
-    status: 2,
-    confirmed: false,
-  },
-  {
-    id: 8,
-    patient: patientsMock[7],
-    age: 39,
-    sex: "M",
-    name: "Mockup + guias de desgaste",
-    deadline: new Date("2023-07-05T11:30:00.000Z"),
-    lab: "Pucci Dental Lab",
-    status: 2,
-    confirmed: false,
-  },
-];
-
 const initialState = {
   searchData: "",
-  services: mock.map((service) => ({
-    ...service,
-    formattedDate: new Intl.DateTimeFormat("pt-BR", {
-      day: "2-digit",
-      month: "short",
-    }).format(new Date(service.deadline)),
-    formattedStatus:
-      service.status === 1
-        ? "Finished"
-        : service.status === 2
-        ? "Delayed"
-        : service.status === 3
-        ? "Adjustments"
-        : service.status === 4
-        ? "On progress"
-        : "Canceled",
-  })),
+  orders: [],
   filtered: [],
+  selected: null,
   pagination: {
     index: 0,
     perPage: 6,
@@ -159,7 +91,7 @@ function reducer(state: StateProps, action: ActionProps) {
     case "SET_NEXT_PAGE": {
       const nextPage = state.pagination.page + 1;
       const nextIndex = (nextPage - 1) * state.pagination.perPage;
-      const nextFiltered = state.services.slice(
+      const nextFiltered = state.orders.slice(
         nextIndex,
         nextIndex + state.pagination.perPage
       );
@@ -180,7 +112,7 @@ function reducer(state: StateProps, action: ActionProps) {
     case "SET_PREV_PAGE": {
       const prevPage = state.pagination.page - 1;
       const prevIndex = (prevPage - 1) * state.pagination.perPage;
-      const prevFiltered = state.services.slice(
+      const prevFiltered = state.orders.slice(
         prevIndex,
         prevIndex + state.pagination.perPage
       );
@@ -198,42 +130,16 @@ function reducer(state: StateProps, action: ActionProps) {
         },
       };
     }
-    case "FILTER_DATA": {
+    case "SELECT_ORDER": {
       const {
         payload: { data },
       } = action;
-      const filteredServices =
-        data !== ""
-          ? state.services.filter(
-              (service) =>
-                service.patient.name
-                  .toLowerCase()
-                  .includes(data.toLowerCase()) ||
-                service.name.toLowerCase().includes(data.toLowerCase()) ||
-                service?.formattedDate
-                  ?.toLowerCase()
-                  .includes(data.toLowerCase()) ||
-                service.sex.toLowerCase().includes(data.toLowerCase()) ||
-                service.deadline.toString().includes(data) ||
-                service.formattedStatus?.toLocaleLowerCase().includes(data)
-            )
-          : state.services;
-      const totalFilteredPages = Math.ceil(
-        filteredServices.length / state.pagination.perPage
-      );
-      const hasNext = totalFilteredPages > 1;
-      const hasPrev = false;
 
       return {
         ...state,
-        searchData: action.payload.data,
-        filtered: filteredServices.slice(0, state.pagination.perPage),
+        selected: state.orders.filter((order) => order.uid === data)[0] || null,
         pagination: {
           ...state.pagination,
-          page: 1,
-          totalPages: totalFilteredPages,
-          next: hasNext,
-          prev: hasPrev,
         },
       };
     }
@@ -246,6 +152,17 @@ function reducer(state: StateProps, action: ActionProps) {
 type ContextProps = {
   state: StateProps;
   dispatch: React.Dispatch<ActionProps>;
+  orders: ProstheticsService[];
+  queryReturn: UseQueryResult<any, unknown> | null;
+  filtered: ProstheticsService[];
+  searchValue: string;
+  setSearchValue: Dispatch<SetStateAction<string>>;
+  setNextPage: () => void;
+  setPrevPage: () => void;
+  pagination: Pagination;
+  hasNext: boolean;
+  hasPrev: boolean;
+  totalPages: number;
 };
 
 type ProviderProps = {
@@ -255,11 +172,90 @@ type ProviderProps = {
 const ProstheticsContext = createContext<ContextProps>({
   state: initialState,
   dispatch: () => null,
+  queryReturn: null,
+  orders: [],
+  filtered: [],
+  searchValue: "",
+  setSearchValue: (prev) => prev,
+  setNextPage: () => null,
+  setPrevPage: () => null,
+  pagination: {
+    ...initialPaginationState,
+  },
+  hasNext: true,
+  hasPrev: false,
+  totalPages: 1,
 });
 
+type QueryResponse = {
+  message: string;
+  data: ProstheticsService[];
+};
+
 const ProstheticsContextProvider = ({ children }: ProviderProps) => {
+  const session = useSession();
+  const userData = session.data?.user || null;
+  const [searchValue, setSearchValue] = useState("");
+
+  const queryReturn = useQuery<QueryResponse, Error>({
+    queryKey: ["get-prosthetics-orders", userData?.id, userData?.accessToken],
+    queryFn: async () => {
+      return getUserProstheticOrders({
+        user_token: userData?.accessToken || "",
+      });
+    },
+    select: (data) => {
+      return {
+        message: data.message,
+        data: data.data.map((order) => ({
+          ...order,
+          service_deadline: new Intl.DateTimeFormat("pt-BR", {
+            day: "2-digit",
+            month: "short",
+            weekday: "short",
+          }).format(new Date(order.service_deadline)),
+          formattedStatus: formatOrderStatus(order.status),
+        })),
+      };
+    },
+  });
+
+  const filterFn = useCallback(
+    (order: ProstheticsService) =>
+      order.dentist_name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      order.dentist?.name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      order.patient?.name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      order.patient_name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      order.dentist_clinic?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      order.lab.name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+      order.service_name.toLowerCase().includes(searchValue.toLowerCase()) ||
+      order.service_material
+        ?.toLowerCase()
+        .includes(searchValue.toLowerCase()) ||
+      order.formattedStatus
+        ?.toLowerCase()
+        .includes(searchValue.toLowerCase()) ||
+      order.service_deadline.toLowerCase().includes(searchValue.toLowerCase()),
+    [searchValue]
+  );
+
+  const orders = queryReturn.data?.data || [];
+
+  const {
+    slicedData,
+    setNextPage,
+    setPrevPage,
+    pagination,
+    hasNext,
+    hasPrev,
+    totalPages,
+  } = usePagination({
+    data: orders,
+    filterFn,
+  });
+
   const [state, dispatch] = useReducer(reducer, initialState, (init) => {
-    const firstSlice = init.services.slice(
+    const firstSlice = init.orders.slice(
       init.pagination.index,
       init.pagination.perPage
     );
@@ -269,14 +265,30 @@ const ProstheticsContextProvider = ({ children }: ProviderProps) => {
       filtered: firstSlice,
       pagination: {
         ...init.pagination,
-        totalPages: Math.ceil(init.services.length / init.pagination.perPage),
+        totalPages: Math.ceil(init.orders.length / init.pagination.perPage),
         next: firstSlice.length <= init.pagination.perPage,
       },
     };
   });
 
   return (
-    <ProstheticsContext.Provider value={{ state, dispatch }}>
+    <ProstheticsContext.Provider
+      value={{
+        state,
+        dispatch,
+        queryReturn,
+        searchValue,
+        setSearchValue,
+        orders,
+        filtered: slicedData,
+        setNextPage,
+        setPrevPage,
+        pagination,
+        hasNext,
+        hasPrev,
+        totalPages,
+      }}
+    >
       {children}
     </ProstheticsContext.Provider>
   );

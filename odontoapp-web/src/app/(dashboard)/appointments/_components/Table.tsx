@@ -6,7 +6,7 @@ import TableRow from "./TableRow";
 import Link from "next/link";
 
 const Table: React.FC = () => {
-  const { state, dispatch } = useAppointments();
+  const { state } = useAppointments();
 
   return (
     <>
@@ -35,7 +35,7 @@ const Table: React.FC = () => {
           )}
         </tbody>
       </table>
-      <Pagination state={state.pagination} dispatch={dispatch} />
+      <Pagination />
     </>
   );
 };

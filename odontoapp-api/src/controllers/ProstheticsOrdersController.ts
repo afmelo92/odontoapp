@@ -247,6 +247,57 @@ class ProstheticsOrdersController {
 
     return res.status(201).json({ message: 'ok' });
   }
+
+  public async index(req: Request, res: Response) {
+    const { id, role, company } = req.user;
+    let dynamicWhere = {};
+
+    switch (role) {
+      case 'DENTIST':
+        dynamicWhere = {
+          dentist_uid: id,
+        };
+        break;
+      case 'LAB':
+        dynamicWhere = {
+          lab_uid: company.uid,
+        };
+        break;
+      case 'ADMIN':
+        dynamicWhere = {};
+        break;
+      default:
+        return res.status(400).json({ message: 'Invalid role.' });
+    }
+
+    const orders = await prisma.prostheticOrders.findMany({
+      where: dynamicWhere,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        lab: {
+          select: {
+            name: true,
+          },
+        },
+        dentist: {
+          select: {
+            name: true,
+          },
+        },
+        patient: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+    return res.json({
+      message: 'ok',
+      data: orders,
+    });
+  }
 }
 
 export default new ProstheticsOrdersController();

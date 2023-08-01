@@ -1,21 +1,19 @@
 "use client";
 
 import { useProstheticsServices } from "../_hooks/useProstheticsServices";
-import Pagination from "@/app/_components/Pagination";
+import Pagination from "./Pagination";
 import TableRow from "./TableRow";
 
 const Table: React.FC = () => {
-  const { state, dispatch } = useProstheticsServices();
+  const { filtered } = useProstheticsServices();
 
   return (
     <>
       <table className="h-full max-h-full w-full">
         <TableRow header />
         <tbody className="grid grid-rows-6 grid-cols-1 h-full">
-          {state.filtered.length > 0 ? (
-            state.filtered.map((service) => (
-              <TableRow key={service.id} service={service} />
-            ))
+          {filtered.length > 0 ? (
+            filtered.map((order) => <TableRow key={order.uid} order={order} />)
           ) : (
             <tr className="row-span-full h-full">
               <td className="h-full flex flex-col gap-8 items-center justify-center">
@@ -31,7 +29,7 @@ const Table: React.FC = () => {
           )}
         </tbody>
       </table>
-      <Pagination state={state.pagination} dispatch={dispatch} />
+      <Pagination />
     </>
   );
 };

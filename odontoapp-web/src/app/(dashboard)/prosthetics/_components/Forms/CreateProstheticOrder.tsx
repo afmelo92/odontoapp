@@ -14,6 +14,7 @@ import { APIResponse } from "@/pages/api/auth/[...nextauth]";
 import APIError from "@/utils/APIError";
 import { createProstheticsOrderMutation } from "@/services/mutations";
 import { Service } from "../../../../../../types/next-auth";
+import { useProstheticsServices } from "../../_hooks/useProstheticsServices";
 
 type CreateProstheticOrderFormProps = {
   onCancel: () => void;
@@ -38,7 +39,8 @@ const CreateProstheticOrderForm: React.FC<CreateProstheticOrderFormProps> = ({
     formState: { errors, isDirty },
   } = useFormContext<CreateProstheticsInputs>();
 
-  const { queryReturn, patients } = usePatients();
+  const { queryReturn: patientsQueryReturn, patients } = usePatients();
+  const { queryReturn: prostheticsQueryReturn } = useProstheticsServices();
 
   const selectedElements = watch("prosthetic_order_teeth_elements");
   const selectedService = watch("prosthetic_order_service_id");
@@ -74,6 +76,7 @@ const CreateProstheticOrderForm: React.FC<CreateProstheticOrderFormProps> = ({
     onSuccess: () => {
       // show toast
       onCancel();
+      prostheticsQueryReturn?.refetch();
     },
     onError: (error) => {
       // show toast
@@ -142,7 +145,7 @@ const CreateProstheticOrderForm: React.FC<CreateProstheticOrderFormProps> = ({
                   <ControlledSelect
                     {...field}
                     label="Patient name"
-                    loading={queryReturn?.isLoading || isLoading}
+                    loading={patientsQueryReturn?.isLoading || isLoading}
                     defaultLabel="Choose patient"
                     options={patients.map((patient) => ({
                       value: patient.uid,
@@ -244,7 +247,7 @@ const CreateProstheticOrderForm: React.FC<CreateProstheticOrderFormProps> = ({
                 {...field}
                 disabled={!currentService?.options?.length}
                 label="Options"
-                defaultLabel="Choose material"
+                defaultLabel="Choose option"
                 loading={isLoading}
                 options={
                   currentService?.options.map((selected) => ({

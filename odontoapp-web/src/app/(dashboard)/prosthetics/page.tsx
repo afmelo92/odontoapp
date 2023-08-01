@@ -53,6 +53,7 @@ const ProstheticsPage: React.FC = () => {
   const handleCreateProstheticOrderClick = useCallback((status: boolean) => {
     setShowCreateProstheticOrderForm(status);
   }, []);
+
   return (
     <>
       <div className="w-full flex items-center justify-between">

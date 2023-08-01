@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 type UsePaginationProps = {
   data: Array<any>;
   // eslint-disable-next-line no-unused-vars
-  filterFn: (value: any, index: number, array: any[]) => unknown;
+  filterFn?: (value: any, index: number, array: any[]) => unknown;
   perPage?: number;
 };
 
@@ -27,7 +27,7 @@ export const initialPaginationState = {
 
 const usePagination = ({
   data = [],
-  filterFn,
+  filterFn = (value) => value,
   perPage = 6,
 }: UsePaginationProps) => {
   const [pagination, setPagination] = useState(() => ({
@@ -35,18 +35,20 @@ const usePagination = ({
     perPage,
   }));
 
-  const filteredData = useMemo(
-    () => data.filter(filterFn || []),
-    [data, filterFn]
-  );
+  const filteredData = useMemo(() => {
+    if (typeof filterFn === "function") {
+      return data.filter(filterFn);
+    }
+    return data;
+  }, [data, filterFn]);
 
   const slicedData = useMemo(
     () =>
       filteredData.slice(
         pagination.index,
-        (pagination.index + 1) * pagination.perPage
+        pagination.page * pagination.perPage
       ),
-    [filteredData, pagination.index, pagination.perPage]
+    [filteredData, pagination.index, pagination.perPage, pagination.page]
   );
 
   const setPrevPage = useCallback(() => {
@@ -56,7 +58,6 @@ const usePagination = ({
 
       return {
         ...prevState,
-
         index: prevIndex,
         page: prevPage,
       };
@@ -76,9 +77,10 @@ const usePagination = ({
     });
   }, []);
 
-  const hasNext = slicedData.length >= pagination.perPage;
-  const hasPrev = pagination.page > 1;
   const totalPages = Math.ceil(filteredData.length / pagination.perPage);
+  const hasNext =
+    !(pagination.page === totalPages) || slicedData.length > pagination.perPage;
+  const hasPrev = pagination.page > 1;
 
   return {
     pagination,

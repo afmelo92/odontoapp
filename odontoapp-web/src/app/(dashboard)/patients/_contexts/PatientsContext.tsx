@@ -375,7 +375,7 @@ const PatientsContextProvider = ({ children }: ProviderProps) => {
       value={{
         state,
         dispatch,
-        patients: patients,
+        patients,
         queryReturn,
         filtered: slicedData,
         searchValue,

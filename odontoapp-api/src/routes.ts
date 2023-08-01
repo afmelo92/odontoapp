@@ -68,6 +68,11 @@ router.post(
   isAuthenticated,
   ProstheticsOrdersController.create
 );
+router.get(
+  '/prosthetics/orders',
+  isAuthenticated,
+  ProstheticsOrdersController.index
+);
 
 // SERVICES
 router.get('/services', isAuthenticated, ServicesController.index);
