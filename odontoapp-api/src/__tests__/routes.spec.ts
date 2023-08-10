@@ -191,6 +191,7 @@ describe('/session', () => {
           'colorScale',
           'role',
           'services',
+          'menu',
         ].sort()
       );
       expect(response.body).toEqual({
